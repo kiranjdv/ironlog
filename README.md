@@ -1,70 +1,113 @@
-# Getting Started with Create React App
+# ⚡ IRONLOG
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A sleek, premium, privacy-focused, and offline-first workout logger and fitness tracker. Built entirely on modern web standards with zero backend database costs.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 📖 Table of Contents
+- [Features](#-features)
+- [Aesthetic & Design Philosophy](#-aesthetic--design-philosophy)
+- [Technology Stack](#-technology-stack)
+- [Security Architecture](#-security-architecture)
+- [Getting Started](#-getting-started)
+- [Data Ownership & Portability](#-data-ownership--portability)
+- [License](#-license)
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## ⚡ Features
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 1. Offline-First Resilience
+- Fully functional workout logging, rest timers, and progress analytics operate without an active internet connection. Perfect for basement gyms or spots with weak cell signals.
 
-### `npm test`
+### 2. Privacy by Design
+- No remote servers or trackers. All routines, logs, and biometric data are stored 100% on your local device's hardware.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 3. Active Workout Session Tracker
+- Build custom templates or log workouts on-the-go.
+- Interactive set tracker supporting standard, warmup, drop, and supersets.
+- **Dynamic Rest Timer:** Triggers a background visual countdown overlay between sets.
 
-### `npm run build`
+### 4. Interactive Progress Analytics
+- Custom built-in SVG line charts track personal records (PRs) and strength volume over time.
+- Muscle distribution frequency graphs map out your training volume dynamically.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 5. Persistent Local Storage
+- Utilizes the browser's Storage Manager API (`navigator.storage.persist()`) to request OS-level protection against browser data cleaning cycles, preventing accidental data loss.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🎨 Aesthetic & Design Philosophy
+- **Dynamic Light/Dark Modes:** Implemented using Vanilla CSS custom properties (variables) mapping to smooth transitions.
+- **Modern Typography:** Styled with Outfit/Inter google fonts.
+- **Glassmorphic UI Components:** Soft shadows, subtle gradients, and crisp cards create a high-end dashboard feel.
+- **Micro-Animations:** Fluid interactions and button transitions bring the app to life.
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🛠️ Technology Stack
+- **Frontend Core:** React 19 (declarative UI & hooks-based state orchestration).
+- **Styling:** Vanilla CSS3 (CSS Variables, Flexbox, Grid) for maximum speed and control.
+- **Client Storage:** LocalStorage wrapped in a custom transactional state engine (`useStore`).
+- **Security:** Native Browser Web Crypto API for secure SHA-256 password hashing.
+- **Service Workers:** Configured for PWA caching, enabling sub-millisecond load times.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🔒 Security Architecture
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Local Password Hashing
+To prevent exposing user credentials in plaintext within browser data stores, **IRONLOG** uses native cryptographic functions:
+* Passwords are converted into a secure **SHA-256 hash** before being committed to `localStorage`.
+* Plaintext passwords are never stored, logged, or exported.
 
-## Learn More
+### Zero-Friction Plaintext Migration
+If you are upgrading from an older version of **IRONLOG**, the application securely handles migration:
+1. When you log in with your plaintext password, the store verifies it.
+2. Upon successful verification, it hashes the password and automatically replaces the plaintext entry in storage.
+3. Subsequent logins use the secure SHA-256 verification pathway.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🚀 Getting Started
 
-### Code Splitting
+### Prerequisites
+Make sure you have Node.js (v18+) installed on your machine.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/kiranjdv/ironlog.git
+   cd ironlog
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-### Analyzing the Bundle Size
+### Running Locally
+To launch the project in development mode:
+```bash
+npm start
+```
+Open [http://localhost:3000](http://localhost:3000) (or the port specified in terminal output) to view it in your browser.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Running Unit Tests
+To run the automated tests in CI/non-watch mode:
+```bash
+npm test
+```
 
-### Making a Progressive Web App
+### Production Build
+To bundle the application into static files for production deployment:
+```bash
+npm run build
+```
+This outputs optimized, minified files inside the `build/` directory, ready to be hosted for free on GitHub Pages, Vercel, Netlify, or similar platforms.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 📂 Data Ownership & Portability
+You own 100% of your data. **IRONLOG** provides import/export interfaces in the Settings page:
+- **JSON Backup:** Exports all user profiles, workout templates, log history, and PR achievements into a single `.json` database file.
+- **JSON Restore:** Upload your backup file to instantly reload all configurations and logs onto any new device.
