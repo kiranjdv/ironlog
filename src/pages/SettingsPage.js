@@ -128,7 +128,6 @@ export default function SettingsPage({ store }) {
           ))}
         </div>
       </div>
-
       {Object.keys(store.prs).length > 0 && (
         <div className="panel">
           <div style={{ padding: 18 }}>

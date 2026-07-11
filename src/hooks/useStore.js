@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ACHIEVEMENTS, WORKOUT_TEMPLATES, MUSCLE_GROUPS } from "../constants/workoutData";
 import { uid, todayStr, getMuscleForExercise } from "../utils/helpers";
+import { hashPassword } from "../utils/crypto";
 
 export default function useStore() {
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function useStore() {
   const [scheduledWorkouts, setScheduledWorkouts] = useState(() => load("il_schedule", {}));
   const [settings, setSettings] = useState(() => load("il_settings", { unit: "kg", theme: "dark" }));
   const [customTemplates, setCustomTemplates] = useState(() => load("il_custom_templates", {}));
-  
+
   // Active Workout Session state
   const [active, setActive] = useState(() => load("il_active", null));
   const [startTime, setStartTime] = useState(() => load("il_start_time", null));
@@ -44,15 +45,30 @@ export default function useStore() {
   const saveStartTime = (v) => { setStartTime(v); save("il_start_time", v); };
   const saveTimerOn = (v) => { setTimerOn(v); save("il_timer_on", v); };
 
-  const register = (name, email, pass) => {
+  const register = async (name, email, pass) => {
     if (users[email]) return "Email already registered";
-    saveUsers({ ...users, [email]: { name, pass } });
+    const hashedPassword = await hashPassword(pass);
+    saveUsers({ ...users, [email]: { name, pass: hashedPassword } });
     setCurrentUser(email); save("il_current", email);
     return null;
   };
-  const login = (email, pass) => {
+  const login = async (email, pass) => {
     if (!users[email]) return "No account found";
-    if (users[email].pass !== pass) return "Wrong password";
+    
+    const storedPass = users[email].pass;
+    const isHashed = typeof storedPass === "string" && storedPass.length === 64 && /^[0-9a-f]{64}$/i.test(storedPass);
+
+    if (isHashed) {
+      const hashedPassword = await hashPassword(pass);
+      if (storedPass !== hashedPassword) return "Wrong password";
+    } else {
+      // Plaintext migration check
+      if (storedPass !== pass) return "Wrong password";
+      // Upgrade plaintext password to secure SHA-256 hash in storage
+      const hashedPassword = await hashPassword(pass);
+      saveUsers({ ...users, [email]: { ...users[email], pass: hashedPassword } });
+    }
+
     setCurrentUser(email); save("il_current", email);
     return null;
   };

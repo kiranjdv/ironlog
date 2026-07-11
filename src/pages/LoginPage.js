@@ -7,14 +7,14 @@ export default function LoginPage({ store }) {
   const [pass, setPass] = useState("");
   const [err, setErr] = useState("");
 
-  const submit = () => {
+  const submit = async () => {
     setErr("");
     if (mode === "login") {
-      const e = store.login(email, pass);
+      const e = await store.login(email, pass);
       if (e) setErr(e);
     } else {
       if (!name.trim()) return setErr("Name required");
-      const e = store.register(name.trim(), email, pass);
+      const e = await store.register(name.trim(), email, pass);
       if (e) setErr(e);
     }
   };
