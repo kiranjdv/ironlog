@@ -114,7 +114,8 @@ export default function WorkoutPage({ store }) {
         : active.exercises.map(ex => (
           <ExerciseCard key={ex.id} exercise={ex} muscleColor={MUSCLE_GROUPS[ex.muscle]?.color || "#888"}
             onUpdate={d => updEx(ex.id, d)} onRemove={() => remEx(ex.id)}
-            prs={store.prs} unit={unit} onSetDone={() => setShowRest(true)} />
+            prs={store.prs} unit={unit} onSetDone={() => setShowRest(true)}
+            workouts={store.workouts} />
         ))}
       <div className="timer-bar">
         <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--muted)" }}>TIME</div>
