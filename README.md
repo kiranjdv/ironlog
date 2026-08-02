@@ -1,6 +1,6 @@
 # ⚡ IRONLOG
 
-**A sleek, offline-first, privacy-focused workout logger and fitness tracker — with an optional AI coach.**
+**A sleek, offline-first, privacy-focused workout logger and fitness tracker.**
 
 IRONLOG runs entirely in your browser. There is no backend server, no account creation on a remote database, and no tracking. All your workouts, personal records, body metrics, and goals live on your device, in your control.
 
@@ -34,7 +34,6 @@ IRONLOG runs entirely in your browser. There is no backend server, no account cr
 | 📅 **Planner** | Weekly schedule view, built-in and custom workout templates |
 | 🎯 **Goals & Achievements** | Set target weight/rep goals per exercise; unlock achievements (streaks, milestones, total sets) |
 | 📏 **Body Tracking** | Log weight, body fat %, and measurements over time with trend charts |
-| 🤖 **AI Coach** *(optional)* | Bring-your-own API key coach that gives advice grounded in your actual training history |
 | 💾 **Backup & Restore** | Export/import your entire dataset as JSON; export workout history as CSV |
 | 🌓 **Dark/Light Mode** | Full theming via CSS variables |
 | 📱 **PWA / Offline Support** | Installable, works fully offline via a service worker |
@@ -61,7 +60,6 @@ IRONLOG addresses all four: it's fully client-side, works with zero connectivity
 - **LocalStorage** — client-side persistence (see [Roadmap](#roadmap) for planned migration to IndexedDB/SQLite)
 - **Service Worker (PWA)** — offline asset caching
 - **Storage Manager API** (`navigator.storage.persist()`) — requests protection from automatic browser data eviction
-- **Anthropic API** *(optional, user-supplied key)* — powers the AI Coach feature
 
 ---
 
@@ -83,7 +81,7 @@ IRONLOG addresses all four: it's fully client-side, works with zero connectivity
    ┌─────────────────┼─────────────────────────┐
    │                 │                         │
 Dashboard   Workout / History / Analytics   Planner / Goals /
-                                            Body / Settings / Coach
+                                            Body / Settings
 ```
 
 Each page receives the `store` object as a prop and reads/calls the functions it needs. Components like `ExerciseCard`, `SetRowComp`, `RestTimer`, and `LineChart` are presentational and reusable across pages.
@@ -130,17 +128,7 @@ npm test
 
 ---
 
-## AI Coach Setup
 
-The AI Coach feature uses the Anthropic API directly from your browser — no backend relay, no data leaving your device except the prompt you choose to send.
-
-1. Get an API key from [console.anthropic.com](https://console.anthropic.com)
-2. Go to **Settings → AI Coach API Key** in IRONLOG and paste it in
-3. Open the **Coach** tab and start asking questions
-
-Your key is stored in `localStorage` alongside the rest of your data and is never transmitted anywhere except directly to Anthropic's API when you send a message. The coach's responses are grounded in your actual logged workouts, PRs, and goals — it does not fabricate data it doesn't have.
-
-**This step is entirely optional.** IRONLOG functions fully as a workout tracker without an API key configured.
 
 ---
 
@@ -222,7 +210,6 @@ This migration is idempotent and safe to run on every load — once a record has
 - [ ] Migrate inline component styles to shared CSS classes
 - [ ] Add input validation across forms
 - [ ] Optional end-to-end encrypted sync via user-linked WebDAV/Google Drive/Dropbox
-- [ ] Expand AI Coach with proactive insights (plateau detection, overtraining risk, auto-generated weekly reports)
 - [ ] Unit + component test coverage with CI (GitHub Actions)
 
 ---

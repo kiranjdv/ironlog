@@ -22,9 +22,35 @@ export default function AnalyticsPage({ store }) {
   Object.entries(store.prs).forEach(([ex, pr]) => { if (pr.weight && pr.reps) strengthScores[ex] = Math.round(pr.weight * (1 + pr.reps / 30)); });
   const topStrength = Object.entries(strengthScores).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const streak = getStreak(ws);
-  const last28 = Array.from({ length: 28 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - (27 - i)); return d.toISOString().split("T")[0]; });
+  
+  // Calculate 53 full weeks ending on the Saturday of the current week (371 days total)
+  const today = new Date();
+  const currentDayOfWeek = today.getDay(); // 0 is Sunday, 6 is Saturday
+  const endingSaturday = new Date(today);
+  endingSaturday.setDate(today.getDate() + (6 - currentDayOfWeek));
+  
+  const dates = [];
+  for (let i = 370; i >= 0; i--) {
+    const d = new Date(endingSaturday);
+    d.setDate(endingSaturday.getDate() - i);
+    dates.push(d.toISOString().split("T")[0]);
+  }
+
   const heatDates = {};
   ws.forEach(w => { heatDates[w.date] = (heatDates[w.date] || 0) + 1; });
+
+  // Get month labels aligned with columns
+  const months = [];
+  let prevMonth = "";
+  for (let w = 0; w < 53; w++) {
+    const SundayDateStr = dates[w * 7];
+    const d = new Date(SundayDateStr);
+    const mName = d.toLocaleString("default", { month: "short" });
+    if (mName !== prevMonth) {
+      months.push({ name: mName, index: w });
+      prevMonth = mName;
+    }
+  }
   return (
     <div className="page">
       <div className="page-title">ANALYTICS</div>
@@ -36,9 +62,38 @@ export default function AnalyticsPage({ store }) {
       </div>
       <div className="prog-grid">
         <div className="prog-card" style={{ gridColumn: "span 2" }}>
-          <div className="prog-title">Activity — Last 28 Days</div>
-          <div className="heatmap">{last28.map(d => { const c = heatDates[d] || 0; const cls = c === 0 ? "" : c === 1 ? "l1" : c === 2 ? "l2" : c === 3 ? "l3" : "l4"; return <div key={d} className={`heat-cell ${cls}`} title={d} />; })}</div>
-          <div className="flex gap8 mt8"><span style={{ fontSize: 10, color: "var(--muted)" }}>Less</span>{["", "l1", "l2", "l3", "l4"].map(c => <div key={c} className={`heat-cell ${c}`} style={{ width: 11, height: 11, borderRadius: 2 }} />)}<span style={{ fontSize: 10, color: "var(--muted)" }}>More</span></div>
+          <div className="prog-title">Activity — Past Year</div>
+          <div className="github-activity-wrap">
+            <div className="day-labels">
+              <span></span>
+              <span>Mon</span>
+              <span></span>
+              <span>Wed</span>
+              <span></span>
+              <span>Fri</span>
+              <span></span>
+            </div>
+            <div className="github-heatmap-container">
+              <div className="month-labels">
+                {months.map((m, idx) => (
+                  <span key={idx} style={{ gridColumnStart: m.index + 1 }}>
+                    {m.name}
+                  </span>
+                ))}
+              </div>
+              <div className="github-heatmap">
+                {dates.map(d => {
+                  const c = heatDates[d] || 0;
+                  const cls = c === 0 ? "" : "l4";
+                  return <div key={d} className={`heat-cell ${cls}`} title={c > 0 ? `${d}: Workout completed` : `${d}: No workout`} />;
+                })}
+              </div>
+            </div>
+          </div>
+          <div className="flex gap6 mt8" style={{ marginLeft: 30, alignItems: "center" }}>
+            <div className="heat-cell l4" style={{ width: 11, height: 11, borderRadius: 2 }} />
+            <span style={{ fontSize: 10, color: "var(--muted)" }}>Workout Day</span>
+          </div>
         </div>
         <div className="prog-card">
           <div className="prog-title">Muscle Balance</div>

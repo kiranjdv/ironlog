@@ -51,7 +51,7 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <div className="nav-r">
+            <div className="nav-r" onClick={e => e.stopPropagation()}>
               <div className="avatar">
                 {store.user?.name?.[0]?.toUpperCase() || "A"}
               </div>

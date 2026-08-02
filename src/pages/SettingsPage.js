@@ -32,7 +32,17 @@ export default function SettingsPage({ store }) {
 
   const exportCSV = () => {
     const rows = [["Date", "Exercise", "Muscle", "Set Type", "Weight", "Reps", "Sets", "Done"]];
-    store.workouts.forEach(w => w.exercises.forEach(ex => ex.sets.forEach(s => rows.push([w.date, ex.name, ex.muscle, s.type, s.weight, s.reps, s.sets, s.done ? "Yes" : "No"]))));
+    store.workouts.forEach(w => {
+      if (w.exercises) {
+        w.exercises.forEach(ex => {
+          if (ex.sets) {
+            ex.sets.forEach(s => {
+              rows.push([w.date, ex.name, ex.muscle, s.type, s.weight, s.reps, s.sets, s.done ? "Yes" : "No"]);
+            });
+          }
+        });
+      }
+    });
     const blob = new Blob([rows.map(r => r.join(",")).join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "ironlog.csv"; a.click(); URL.revokeObjectURL(url);
@@ -101,28 +111,78 @@ export default function SettingsPage({ store }) {
     reader.readAsText(file);
   };
 
+
+
+  const settingsRows = [
+    { 
+      l: "Weight Unit", 
+      s: "Used everywhere", 
+      el: (
+        <div className="toggle">
+          <button className={`toggle-btn ${settings.unit === "kg" ? "active" : ""}`} onClick={() => saveSettings({ ...settings, unit: "kg" })}>kg</button>
+          <button className={`toggle-btn ${settings.unit === "lbs" ? "active" : ""}`} onClick={() => saveSettings({ ...settings, unit: "lbs" })}>lbs</button>
+        </div>
+      )
+    },
+    { 
+      l: "Theme", 
+      s: "App appearance", 
+      el: (
+        <div className="toggle">
+          <button className={`toggle-btn ${settings.theme === "dark" ? "active" : ""}`} onClick={() => saveSettings({ ...settings, theme: "dark" })}>🌙 Dark</button>
+          <button className={`toggle-btn ${settings.theme === "light" ? "active" : ""}`} onClick={() => saveSettings({ ...settings, theme: "light" })}>☀️ Light</button>
+        </div>
+      )
+    },
+
+    { 
+      l: "Storage Persistence", 
+      s: persistent ? "✓ Secured (Browser won't auto-clear)" : "Standard (Request persistence protection)", 
+      el: <button className={`btn ${persistent ? "btn-out" : "btn-purple"}`} onClick={requestPersistence} disabled={persistent}>{persistent ? "Secured" : "Request"}</button> 
+    },
+    { 
+      l: "Backup JSON", 
+      s: "Save all your logs to a JSON file", 
+      el: <button className="btn btn-acc" onClick={exportJSON}>{backupDone ? "✓ Saved!" : "Backup (.json)"}</button> 
+    },
+    { 
+      l: "Restore JSON", 
+      s: "Import a saved JSON backup file", 
+      el: <div><input type="file" ref={fileInputRef} onChange={importJSON} accept=".json" style={{ display: "none" }} /><button className="btn btn-out" onClick={() => fileInputRef.current?.click()}>Restore</button></div> 
+    },
+    { 
+      l: "Export CSV", 
+      s: "Download workouts for Excel/Spreadsheets", 
+      el: <button className="btn btn-out" onClick={exportCSV}>{exportDone ? "✓ Done!" : "Export CSV"}</button> 
+    },
+    { 
+      l: "Sign Out", 
+      s: "Log out from connection and device session", 
+      el: <button className="btn btn-danger" onClick={store.logout}>Logout</button> 
+    },
+  ];
+
   return (
     <div className="page">
       <div className="page-title">SETTINGS</div>
       <div className="page-sub">Customize your experience</div>
       <div className="panel mb20">
         <div style={{ padding: 18 }}>
-          <div className="sec-lbl">PROFILE</div>
+          <div className="sec-lbl">PROFILE & SETTINGS</div>
           <div className="flex gap12 mb16">
             <div className="avatar" style={{ width: 52, height: 52, fontSize: 20 }}>{store.user?.name?.[0]?.toUpperCase() || "A"}</div>
-            <div><div style={{ fontWeight: 700, fontSize: 15 }}>{store.user?.name}</div><div style={{ color: "var(--muted)", fontSize: 12 }}>{store.currentUser}</div><div style={{ color: "var(--muted)", fontSize: 11, marginTop: 2 }}>{store.workouts.length} workouts</div></div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15 }}>{store.user?.name}</div>
+              <div style={{ color: "var(--muted)", fontSize: 12 }}>{store.currentUser}</div>
+              <div style={{ color: "var(--muted)", fontSize: 11, marginTop: 2 }}>{store.workouts.length} workouts logged</div>
+            </div>
           </div>
-          {[
-            { l: "Weight Unit", s: "Used everywhere", el: <div className="toggle"><button className={`toggle-btn ${settings.unit === "kg" ? "active" : ""}`} onClick={() => saveSettings({ ...settings, unit: "kg" })}>kg</button><button className={`toggle-btn ${settings.unit === "lbs" ? "active" : ""}`} onClick={() => saveSettings({ ...settings, unit: "lbs" })}>lbs</button></div> },
-            { l: "Theme", s: "App appearance", el: <div className="toggle"><button className={`toggle-btn ${settings.theme === "dark" ? "active" : ""}`} onClick={() => saveSettings({ ...settings, theme: "dark" })}>🌙 Dark</button><button className={`toggle-btn ${settings.theme === "light" ? "active" : ""}`} onClick={() => saveSettings({ ...settings, theme: "light" })}>☀️ Light</button></div> },
-            { l: "Storage Persistence", s: persistent ? "✓ Secured (Browser won't auto-clear)" : "Standard (Request persistence protection)", el: <button className={`btn ${persistent ? "btn-out" : "btn-purple"}`} onClick={requestPersistence} disabled={persistent}>{persistent ? "Secured" : "Request"}</button> },
-            { l: "Backup JSON", s: "Save all your logs to a JSON file", el: <button className="btn btn-acc" onClick={exportJSON}>{backupDone ? "✓ Saved!" : "Backup (.json)"}</button> },
-            { l: "Restore JSON", s: "Import a saved JSON backup file", el: <div><input type="file" ref={fileInputRef} onChange={importJSON} accept=".json" style={{ display: "none" }} /><button className="btn btn-out" onClick={() => fileInputRef.current?.click()}>Restore</button></div> },
-            { l: "Export CSV", s: "Download workouts for Excel/Spreadsheets", el: <button className="btn btn-out" onClick={exportCSV}>{exportDone ? "✓ Done!" : "Export CSV"}</button> },
-            { l: "Sign Out", s: "Log out", el: <button className="btn btn-danger" onClick={store.logout}>Logout</button> },
-          ].map((r, i) => (
-            <div key={r.l} className="setting-row" style={i === 6 ? { borderBottom: "none" } : {}}>
-              <div><div className="setting-lbl">{r.l}</div><div className="setting-sub">{r.s}</div></div>
+          {settingsRows.map((r, i) => (
+            <div key={r.l} className="setting-row" style={i === settingsRows.length - 1 ? { borderBottom: "none" } : {}}>
+              <div>
+                <div className="setting-lbl">{r.l}</div>
+                <div className="setting-sub">{r.s}</div>
+              </div>
               {r.el}
             </div>
           ))}
