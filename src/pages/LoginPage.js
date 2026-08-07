@@ -9,15 +9,34 @@ export default function LoginPage({ store }) {
 
   const submit = async () => {
     setErr("");
+    const cleanEmail = email.trim().toLowerCase();
+    
+    if (!cleanEmail || !pass) {
+      return setErr("Email and password are required");
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return setErr("Please enter a valid email address");
+    }
+
+    if (pass.length < 6) {
+      return setErr("Password must be at least 6 characters");
+    }
+
     if (mode === "login") {
-      const e = await store.login(email, pass);
+      const e = await store.login(cleanEmail, pass);
       if (e) setErr(e);
     } else {
-      if (!name.trim()) return setErr("Name required");
-      const e = await store.register(name.trim(), email, pass);
+      if (!name.trim()) return setErr("Name is required");
+      const e = await store.register(name.trim(), cleanEmail, pass);
       if (e) setErr(e);
     }
   };
+
+  const isValid = mode === "login"
+    ? email.trim() !== "" && pass !== ""
+    : name.trim() !== "" && email.trim() !== "" && pass !== "";
 
   return (
     <div className="login-wrap">
@@ -37,10 +56,10 @@ export default function LoginPage({ store }) {
         </div>
         <div className="field">
           <label>Password</label>
-          <input type="password" placeholder="••••••••" value={pass} onChange={e => setPass(e.target.value)} onKeyDown={e => e.key === "Enter" && submit()} />
+          <input type="password" placeholder="••••••••" value={pass} onChange={e => setPass(e.target.value)} onKeyDown={e => e.key === "Enter" && isValid && submit()} />
         </div>
         {err && <div className="err">{err}</div>}
-        <button className="btn-primary" onClick={submit}>{mode === "login" ? "Login" : "Create Account"}</button>
+        <button className="btn-primary" onClick={submit} disabled={!isValid}>{mode === "login" ? "Login" : "Create Account"}</button>
         <div className="login-switch">
           {mode === "login" ? (
             <>No account? <span onClick={() => { setMode("register"); setErr(""); }}>Sign up</span></>

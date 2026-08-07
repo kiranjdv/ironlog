@@ -8,9 +8,19 @@ export default function BodyPage({ store }) {
   const latest = store.bodyLog.slice(-1)[0] || {};
   const prev = store.bodyLog.slice(-2, -1)[0] || {};
   const diff = (key) => { const l = parseFloat(latest[key] || 0), p = parseFloat(prev[key] || 0); if (!l || !p) return null; const d = (l - p).toFixed(1); return d > 0 ? `+${d}` : `${d}`; };
+  const isFormEmpty = !Object.values(form).some(v => v.trim() !== "");
+  const hasInvalidValues = Object.entries(form).some(([k, v]) => v.trim() !== "" && (parseFloat(v) <= 0 || isNaN(parseFloat(v))));
+  const isInvalid = isFormEmpty || hasInvalidValues;
+
   const save = () => {
-    if (!Object.values(form).some(v => v.trim())) return;
-    store.addBodyEntry(form);
+    if (isInvalid) return;
+    const sanitized = {};
+    Object.entries(form).forEach(([k, v]) => {
+      if (v.trim() !== "") {
+        sanitized[k] = parseFloat(v);
+      }
+    });
+    store.addBodyEntry(sanitized);
     setForm({ weight: "", bodyFat: "", chest: "", waist: "", hips: "", arms: "", legs: "" });
     setSaved(true); setTimeout(() => setSaved(false), 2000);
   };
@@ -45,7 +55,7 @@ export default function BodyPage({ store }) {
               <div key={f.k}><div className="il">{f.l}</div><input className="inp" type="number" placeholder={f.ph} value={form[f.k]} onChange={e => setForm(p => ({ ...p, [f.k]: e.target.value }))} /></div>
             ))}
           </div>
-          <button className="btn btn-acc mt16" style={{ padding: "11px 26px" }} onClick={save}>{saved ? "✓ Saved!" : "Save Measurements"}</button>
+          <button className="btn btn-acc mt16" style={{ padding: "11px 26px" }} onClick={save} disabled={isInvalid}>{saved ? "✓ Saved!" : "Save Measurements"}</button>
         </div>
       </div>
     </div>

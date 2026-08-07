@@ -168,7 +168,7 @@ export default function WorkoutPage({ store }) {
               <div className="mb16"><div className="il">Muscle Group</div>
                 <select className="inp" value={customMuscle} onChange={e => setCustomMuscle(e.target.value)}>{Object.keys(MUSCLE_GROUPS).map(m => <option key={m}>{m}</option>)}</select>
               </div>
-              <button className="btn btn-acc" style={{ width: "100%", padding: 11 }} onClick={addCustomEx}>Add & Use</button>
+              <button className="btn btn-acc" style={{ width: "100%", padding: 11 }} onClick={addCustomEx} disabled={!customName.trim()}>Add & Use</button>
             </div>
           </div>
         </div>

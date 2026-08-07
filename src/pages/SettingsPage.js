@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { fmtDate } from "../utils/helpers";
+import { dbGet, dbGetAll, dbPut, dbClear } from "../utils/db";
 
 export default function SettingsPage({ store }) {
   const { settings, saveSettings } = store;
@@ -49,15 +50,55 @@ export default function SettingsPage({ store }) {
     setExportDone(true); setTimeout(() => setExportDone(false), 2000);
   };
 
-  const exportJSON = () => {
+  const exportJSON = async () => {
     try {
+      if (!store.db) {
+        alert("Database is not ready yet.");
+        return;
+      }
       const backup = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith("il_")) {
-          backup[key] = localStorage.getItem(key);
+      const db = store.db;
+
+      // 1. Fetch users
+      const usersArray = await dbGetAll(db, "users");
+      const usersObj = {};
+      usersArray.forEach(u => {
+        usersObj[u.email] = { name: u.name, pass: u.pass };
+      });
+      backup["il_users"] = JSON.stringify(usersObj);
+
+      // 2. Fetch workouts
+      const workoutsArray = await dbGetAll(db, "workouts");
+      backup["il_workouts"] = JSON.stringify(workoutsArray);
+
+      // 3. Fetch body log
+      const bodyArray = await dbGetAll(db, "bodyLog");
+      backup["il_body"] = JSON.stringify(bodyArray);
+
+      // 4. Fetch goals
+      const goalsArray = await dbGetAll(db, "goals");
+      backup["il_goals"] = JSON.stringify(goalsArray);
+
+      // 5. Fetch singletons from kv store
+      const kvKeys = {
+        "prs": "il_prs",
+        "customExercises": "il_custom_ex",
+        "scheduledWorkouts": "il_schedule",
+        "settings": "il_settings",
+        "customTemplates": "il_custom_templates",
+        "active": "il_active",
+        "startTime": "il_start_time",
+        "timerOn": "il_timer_on",
+        "currentUser": "il_current"
+      };
+
+      for (const [dbKey, localKey] of Object.entries(kvKeys)) {
+        const val = await dbGet(db, "kv", dbKey);
+        if (val !== undefined && val !== null) {
+          backup[localKey] = JSON.stringify(val);
         }
       }
+
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -76,8 +117,12 @@ export default function SettingsPage({ store }) {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
       try {
+        if (!store.db) {
+          alert("Database is not ready yet.");
+          return;
+        }
         const backup = JSON.parse(evt.target.result);
         if (typeof backup !== "object" || backup === null) {
           alert("Invalid backup file format.");
@@ -96,16 +141,77 @@ export default function SettingsPage({ store }) {
         );
         if (!confirmRestore) return;
 
-        Object.entries(backup).forEach(([key, val]) => {
-          if (key.startsWith("il_")) {
-            localStorage.setItem(key, val);
+        const db = store.db;
+
+        // Clear existing tables
+        await dbClear(db, "users");
+        await dbClear(db, "workouts");
+        await dbClear(db, "bodyLog");
+        await dbClear(db, "goals");
+        await dbClear(db, "kv");
+
+        // Parse backup data
+        const safeParse = (str, def) => {
+          try {
+            return str ? JSON.parse(str) : def;
+          } catch {
+            return def;
           }
-        });
+        };
+
+        // Write users
+        const backupUsers = safeParse(backup["il_users"], {});
+        for (const [email, u] of Object.entries(backupUsers)) {
+          await dbPut(db, "users", { email, name: u.name, pass: u.pass });
+        }
+
+        // Write workouts
+        const backupWorkouts = safeParse(backup["il_workouts"], []);
+        for (const w of backupWorkouts) {
+          if (w && w.id) await dbPut(db, "workouts", w);
+        }
+
+        // Write body
+        const backupBody = safeParse(backup["il_body"], []);
+        for (const b of backupBody) {
+          if (b && b.id) await dbPut(db, "bodyLog", b);
+        }
+
+        // Write goals
+        const backupGoals = safeParse(backup["il_goals"], []);
+        for (const g of backupGoals) {
+          if (g && g.id) await dbPut(db, "goals", g);
+        }
+
+        // Write kv values
+        const kvKeys = {
+          "il_prs": "prs",
+          "il_custom_ex": "customExercises",
+          "il_schedule": "scheduledWorkouts",
+          "il_settings": "settings",
+          "il_custom_templates": "customTemplates",
+          "il_active": "active",
+          "il_start_time": "startTime",
+          "il_timer_on": "timerOn",
+          "il_current": "currentUser"
+        };
+
+        for (const [localKey, dbKey] of Object.entries(kvKeys)) {
+          if (backup[localKey] !== undefined) {
+            const val = safeParse(backup[localKey], null);
+            if (val !== null && val !== undefined) {
+              await dbPut(db, "kv", val, dbKey);
+            }
+          }
+        }
+
+        // Write migrated flag to kv
+        await dbPut(db, "kv", true, "migrated_from_localstorage");
 
         alert("Backup restored successfully! The app will reload now.");
         window.location.reload();
       } catch (err) {
-        alert("Failed to parse backup file: " + err.message);
+        alert("Failed to restore backup: " + err.message);
       }
     };
     reader.readAsText(file);

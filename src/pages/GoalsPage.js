@@ -4,7 +4,18 @@ import { ACHIEVEMENTS } from "../constants/workoutData";
 export default function GoalsPage({ store }) {
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ exercise: "", targetWeight: "", targetReps: "", notes: "" });
-  const addGoal = () => { if (!form.exercise) return; store.addGoal({ ...form }); setForm({ exercise: "", targetWeight: "", targetReps: "", notes: "" }); setShowAdd(false); };
+  const addGoal = () => {
+    if (!form.exercise.trim() || !form.targetWeight || parseFloat(form.targetWeight) <= 0 || !form.targetReps || parseInt(form.targetReps) <= 0) return;
+    store.addGoal({
+      ...form,
+      exercise: form.exercise.trim(),
+      targetWeight: parseFloat(form.targetWeight),
+      targetReps: parseInt(form.targetReps)
+    });
+    setForm({ exercise: "", targetWeight: "", targetReps: "", notes: "" });
+    setShowAdd(false);
+  };
+  const isInvalid = !form.exercise.trim() || !form.targetWeight || parseFloat(form.targetWeight) <= 0 || !form.targetReps || parseInt(form.targetReps) <= 0;
   const getProgress = (goal) => { const pr = store.prs[goal.exercise]; if (!pr || !goal.targetWeight) return 0; return Math.min(100, Math.round((pr.weight / parseFloat(goal.targetWeight)) * 100)); };
   return (
     <div className="page">
@@ -54,7 +65,7 @@ export default function GoalsPage({ store }) {
               {[{ l: "Exercise", k: "exercise", ph: "e.g. Bench Press", t: "text" }, { l: `Target Weight (${store.settings.unit})`, k: "targetWeight", ph: "e.g. 100", t: "number" }, { l: "Target Reps", k: "targetReps", ph: "e.g. 5", t: "number" }, { l: "Notes", k: "notes", ph: "Optional...", t: "text" }].map(f => (
                 <div key={f.k} className="mb12"><div className="il">{f.l}</div><input className="inp" type={f.t} placeholder={f.ph} value={form[f.k]} onChange={e => setForm(p => ({ ...p, [f.k]: e.target.value }))} /></div>
               ))}
-              <button className="btn btn-acc" style={{ width: "100%", padding: 11 }} onClick={addGoal}>Create Goal</button>
+              <button className="btn btn-acc" style={{ width: "100%", padding: 11 }} onClick={addGoal} disabled={isInvalid}>Create Goal</button>
             </div>
           </div>
         </div>

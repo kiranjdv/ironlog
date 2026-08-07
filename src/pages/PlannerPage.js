@@ -163,7 +163,7 @@ export default function PlannerPage({ store }) {
                   {newTmplExercises.length === 0 && <span style={{ color: "var(--muted)", fontSize: 12 }}>No exercises selected yet.</span>}
                 </div>
               </div>
-              <button className="btn btn-acc" style={{ width: "100%", padding: 11 }} onClick={handleSave}>Create Template</button>
+              <button className="btn btn-acc" style={{ width: "100%", padding: 11 }} onClick={handleSave} disabled={!newTmplName.trim() || newTmplExercises.length === 0}>Create Template</button>
             </div>
           </div>
         </div>

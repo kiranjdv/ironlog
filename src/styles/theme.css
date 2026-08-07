@@ -392,3 +392,75 @@ input:checked + .switch-slider:before {
   .page{padding:13px;}
   .nav{padding:0 13px;}
 }
+
+/* Database Loading Screen */
+.db-loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 20% 50%, var(--bg-radial-1) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, var(--bg-radial-2) 0%, transparent 50%), var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.db-loading-content {
+  text-align: center;
+}
+
+.db-loading-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  margin-bottom: 20px;
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+.db-loading-spinner-wrap {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.db-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(200, 255, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--accent);
+  animation: spin 1s ease-in-out infinite;
+}
+
+.db-loading-text {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.8;
+    text-shadow: 0 0 10px rgba(200, 255, 0, 0.2);
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 25px rgba(200, 255, 0, 0.8);
+  }
+}
+
+/* Disabled state for buttons */
+.btn:disabled, .btn-primary:disabled, .toggle-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+

@@ -21,6 +21,20 @@ export default function App() {
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   }, [dark]);
 
+  if (store.isDbLoading) {
+    return (
+      <div className="db-loading-screen">
+        <div className="db-loading-content">
+          <div className="db-loading-logo">⚡ IRONLOG</div>
+          <div className="db-loading-spinner-wrap">
+            <div className="db-loading-spinner"></div>
+          </div>
+          <div className="db-loading-text">Initializing Secure Database...</div>
+        </div>
+      </div>
+    );
+  }
+
   const TABS = [
     { id: "dashboard", l: "Dashboard" },
     { id: "workout", l: "Workout" },
