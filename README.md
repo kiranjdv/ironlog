@@ -57,7 +57,7 @@ IRONLOG addresses all four: it's fully client-side, works with zero connectivity
 
 - **React 19** — component architecture, hooks-based state management
 - **Vanilla CSS3** — CSS custom properties for instant theme switching, responsive Grid/Flexbox layout
-- **LocalStorage** — client-side persistence (see [Roadmap](#roadmap) for planned migration to IndexedDB/SQLite)
+- **IndexedDB** — client-side structured database persistence (with automatic, backwards-compatible local migration from localStorage)
 - **Service Worker (PWA)** — offline asset caching
 - **Storage Manager API** (`navigator.storage.persist()`) — requests protection from automatic browser data eviction
 
@@ -86,7 +86,7 @@ Dashboard   Workout / History / Analytics   Planner / Goals /
 
 Each page receives the `store` object as a prop and reads/calls the functions it needs. Components like `ExerciseCard`, `SetRowComp`, `RestTimer`, and `LineChart` are presentational and reusable across pages.
 
-> **Note:** `useStore.js` currently centralizes all state in a single hook. A planned refactor will split this into `useAuth`, `useWorkouts`, `usePlanner`, and `useSettings` for better separation of concerns — see [Roadmap](#roadmap).
+> **Note:** `useStore.js` orchestrates focused modular sub-hooks: `useAuth`, `useSettings`, `useWorkouts`, `usePlanner`, `useBodyLog`, `useGoals`, and `useCustomExercises` for better separation of concerns and maintainability.
 
 ---
 
@@ -139,14 +139,23 @@ src/
 ├── components/         # Reusable UI pieces (ExerciseCard, RestTimer, LineChart, etc.)
 ├── constants/           # Static data: muscle groups, templates, achievements
 ├── hooks/
-│   └── useStore.js      # Central state hook (auth, workouts, settings, etc.)
-├── pages/               # One component per tab (Dashboard, Workout, Analytics, ...)
+│   ├── useAuth.js            # User credentials and local session hook
+│   ├── useBodyLog.js         # Body metrics logs state hook
+│   ├── useCustomExercises.js  # Custom exercises state hook
+│   ├── useGoals.js           # Target goals state hook
+│   ├── usePlanner.js         # Weekly schedules and template design hook
+│   ├── useSettings.js        # User units and theme preferences hook
+│   ├── useStore.js           # Main hook orchestrator
+│   └── useWorkouts.js        # Workouts history and active log hook
+├── pages/                    # One component per tab (Dashboard, Workout, Analytics, ...)
 ├── styles/
-│   └── theme.css        # All app styling via CSS custom properties
+│   └── theme.css             # All app styling via CSS custom properties (inc. dark/light modes)
 ├── utils/
-│   └── helpers.js        # Date formatting, streak calculation, etc.
-├── App.js               # Tab routing & top-level layout
-└── index.js             # Entry point + service worker registration
+│   ├── crypto.js             # Web Crypto SHA-256 password hashing
+│   ├── db.js                 # IndexedDB client-side database helper and mock DB
+│   └── helpers.js            # Date formatting, streak calculation, etc.
+├── App.js                    # Tab routing, database loading screen, & top-level layout
+└── index.js                  # Entry point + service worker registration
 
 public/
 ├── manifest.json        # PWA manifest
@@ -157,9 +166,9 @@ public/
 
 ## Data & Privacy
 
-- All data is stored under `localStorage` keys prefixed with `il_` (e.g. `il_workouts`, `il_prs`, `il_settings`)
-- **Backup**: Settings → Backup (.json) collects all `il_`-prefixed keys into a single downloadable file
-- **Restore**: Settings → Restore replaces current data with a previously exported backup (with a confirmation prompt)
+- All data is stored locally in an IndexedDB database named `ironlog_db` (using dedicated object stores for workouts, body logs, goals, users, and a key-value store for preferences/metadata).
+- **Backup**: Settings → Backup (.json) queries all IndexedDB tables and compiles them into a single downloadable file.
+- **Restore**: Settings → Restore wipes all IndexedDB tables and restores the JSON backup file (fully compatible with backups from previous versions).
 - **Export CSV**: Download your workout history in spreadsheet-friendly format
 - **Persistent Storage**: Settings → Request asks the browser to exempt IRONLOG from automatic storage eviction
 
@@ -169,7 +178,7 @@ public/
 
 ### Password Hashing
 
-Account passwords are no longer stored in plaintext. On registration and login, IRONLOG hashes the password client-side using the **Web Crypto API's SHA-256** implementation (`crypto.subtle.digest`) before it ever touches `localStorage`. Only the resulting hash is persisted under `il_users` — the raw password stays in memory only for the duration of the hashing call and is discarded immediately after.
+Account passwords are no longer stored in plaintext. On registration and login, IRONLOG hashes the password client-side using the **Web Crypto API's SHA-256** implementation (`crypto.subtle.digest`) before it ever touches the database. Only the resulting hash is persisted under the `users` database table — the raw password stays in memory only for the duration of the hashing call and is discarded immediately after.
 
 At a high level, the flow is:
 
@@ -180,7 +189,7 @@ User enters password
 SHA-256 hash (with per-user salt)
         │
         ▼
-Store { name, email, passwordHash, salt } in il_users
+Store { name, email, passwordHash, salt } in users store
 ```
 
 A per-user salt is generated (via `crypto.getRandomValues`) and stored alongside the hash, so two users with the same password don't produce identical hash values, and precomputed rainbow-table lookups are far less useful against the stored data.
@@ -191,12 +200,12 @@ On login, the entered password is salted and hashed the same way, and the result
 
 ### Automatic Plaintext Migration
 
-Existing installs that registered accounts before this change had plaintext passwords sitting in `il_users`. To avoid silently breaking logins or forcing a manual reset, IRONLOG runs a **one-time, automatic migration** the first time it loads after the update:
+Existing installs that registered accounts before this change had plaintext passwords sitting in the user database. To avoid silently breaking logins or forcing a manual reset, IRONLOG runs a **one-time, automatic migration** the first time it loads after the update:
 
-1. On startup, the store reads `il_users` and inspects each user record.
+1. On startup, the store reads the `users` table and inspects each user record.
 2. Any record missing a `passwordHash`/`salt` pair (i.e., still holding a raw `pass` field) is detected as a legacy plaintext entry.
 3. For each legacy entry, IRONLOG generates a fresh salt, hashes the existing plaintext password with it, writes the new `{ passwordHash, salt }` fields, and **deletes the plaintext `pass` field** from that record.
-4. The migrated `il_users` object is written back to `localStorage`, replacing the old plaintext version.
+4. The migrated `users` object is written back to IndexedDB, replacing the old plaintext version.
 
 This migration is idempotent and safe to run on every load — once a record has a `passwordHash`, it's skipped on subsequent checks. Users experience no visible change: existing credentials continue to work, but are now hashed at rest going forward.
 
@@ -205,10 +214,10 @@ This migration is idempotent and safe to run on every load — once a record has
 ## Roadmap
 
 - [x] Hash stored passwords (client-side) instead of plaintext
-- [ ] Split `useStore.js` into focused hooks: `useAuth`, `useWorkouts`, `usePlanner`, `useSettings`
-- [ ] Migrate from `localStorage` to IndexedDB or WASM SQLite for structured queries and larger datasets
+- [x] Split `useStore.js` into focused hooks: `useAuth`, `useWorkouts`, `usePlanner`, `useSettings`
+- [x] Migrate from `localStorage` to IndexedDB or WASM SQLite for structured queries and larger datasets
 - [ ] Migrate inline component styles to shared CSS classes
-- [ ] Add input validation across forms
+- [x] Add input validation across forms
 - [ ] Optional end-to-end encrypted sync via user-linked WebDAV/Google Drive/Dropbox
 - [ ] Unit + component test coverage with CI (GitHub Actions)
 
@@ -218,7 +227,7 @@ This migration is idempotent and safe to run on every load — once a record has
 
 - Authentication is client-side only (SHA-256 hashed, salted, and local — see [Security](#security)) and is not intended as a substitute for real server-side authentication in contexts with network-exposed login
 - Single-device by default (no built-in sync; use JSON export/import to move data between devices)
-- `useStore.js` is a large, centralized hook that could be modularized further
+- Modularized hooks are orchestrated by `useStore.js` to simplify layout but are fully separate hooks internally.
 - Some components rely on inline styles rather than shared CSS classes
 
 ---
