@@ -36,14 +36,23 @@ export default function App() {
   }
 
   const TABS = [
-    { id: "dashboard", l: "Dashboard" },
-    { id: "workout", l: "Workout" },
-    { id: "history", l: "History" },
-    { id: "analytics", l: "Analytics" },
-    { id: "body", l: "Body" },
-    { id: "planner", l: "Planner" },
-    { id: "goals", l: "Goals" },
-    { id: "settings", l: "Settings" },
+    { id: "dashboard", l: "Dashboard", icon: "📊" },
+    { id: "workout", l: "Workout", icon: "🏋️" },
+    { id: "history", l: "History", icon: "📋" },
+    { id: "analytics", l: "Analytics", icon: "📈" },
+    { id: "body", l: "Body", icon: "⚖️" },
+    { id: "planner", l: "Planner", icon: "📅" },
+    { id: "goals", l: "Goals", icon: "🎯" },
+    { id: "settings", l: "Settings", icon: "⚙️" },
+  ];
+
+  const MOBILE_DOCK_TABS = [
+    { id: "dashboard", l: "Home", icon: "📊" },
+    { id: "workout", l: "Workout", icon: "🏋️" },
+    { id: "history", l: "History", icon: "📋" },
+    { id: "analytics", l: "Stats", icon: "📈" },
+    { id: "body", l: "Body", icon: "⚖️" },
+    { id: "settings", l: "Settings", icon: "⚙️" },
   ];
 
   return (
@@ -53,9 +62,24 @@ export default function App() {
       ) : (
         <>
           <nav className="nav">
-            <div className="nav-logo">⚡ IRONLOG</div>
+            <div className="nav-left">
+              <div className="nav-logo" onClick={() => setTab("dashboard")} style={{ cursor: "pointer" }}>
+                ⚡ IRONLOG
+              </div>
+              {store.active && (
+                <div
+                  className="nav-live-badge"
+                  onClick={() => setTab("workout")}
+                  title="Workout in progress — click to return"
+                >
+                  <span className="live-dot"></span>
+                  <span>LIVE WORKOUT</span>
+                </div>
+              )}
+            </div>
+
             <div className="nav-tabs">
-              {TABS.map(t => (
+              {TABS.map((t) => (
                 <button
                   key={t.id}
                   className={`nav-tab ${tab === t.id ? "active" : ""}`}
@@ -65,20 +89,43 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <div className="nav-r" onClick={e => e.stopPropagation()}>
-              <div className="avatar">
+
+            <div className="nav-r">
+              <div
+                className="avatar"
+                onClick={() => setTab("settings")}
+                title={`Logged in as ${store.user?.name || "Athlete"}`}
+              >
                 {store.user?.name?.[0]?.toUpperCase() || "A"}
               </div>
             </div>
           </nav>
-          {tab === "dashboard" && <DashboardPage store={store} />}
-          {tab === "workout" && <WorkoutPage store={store} />}
-          {tab === "history" && <HistoryPage store={store} />}
+
+          {/* Main Views */}
+          {tab === "dashboard" && <DashboardPage store={store} setTab={setTab} />}
+          {tab === "workout" && <WorkoutPage store={store} setTab={setTab} />}
+          {tab === "history" && <HistoryPage store={store} setTab={setTab} />}
           {tab === "analytics" && <AnalyticsPage store={store} />}
           {tab === "body" && <BodyPage store={store} />}
           {tab === "planner" && <PlannerPage store={store} />}
-          {tab === "goals" && <GoalsPage store={store} />}
+          {tab === "goals" && <GoalsPage store={store} setTab={setTab} />}
           {tab === "settings" && <SettingsPage store={store} />}
+
+          {/* Floating Mobile Bottom Dock */}
+          <nav className="mobile-dock">
+            <div className="mobile-dock-inner">
+              {MOBILE_DOCK_TABS.map((t) => (
+                <button
+                  key={t.id}
+                  className={`dock-item ${tab === t.id ? "active" : ""}`}
+                  onClick={() => setTab(t.id)}
+                >
+                  <span className="dock-icon">{t.icon}</span>
+                  <span>{t.l}</span>
+                </button>
+              ))}
+            </div>
+          </nav>
         </>
       )}
     </div>

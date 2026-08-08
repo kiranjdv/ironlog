@@ -1,6 +1,6 @@
 import CheckSVG from "./CheckSVG";
 
-export default function SetRowComp({ set, idx, onChange, onRemove, prs, exName, unit, prevSet }) {
+export default function SetRowComp({ set, idx, onChange, prs, exName, unit, prevSet }) {
   const isWarmup = set.type === "warmup";
   const isSuper = set.type === "superset";
   const isDrop = set.type === "dropset";

@@ -4,7 +4,6 @@ import { uid } from "../utils/helpers";
 export default function ExerciseCard({ exercise, muscleColor, onUpdate, onRemove, prs, unit, onSetDone, workouts }) {
   const addSet = (type) => onUpdate({ ...exercise, sets: [...exercise.sets, { id: uid(), type, weight: "", reps: "", sets: 1, done: false }] });
   const updSet = (id, data) => onUpdate({ ...exercise, sets: exercise.sets.map(s => s.id === id ? data : s) });
-  const remSet = (id) => onUpdate({ ...exercise, sets: exercise.sets.filter(s => s.id !== id) });
 
   const hasPR = exercise.sets.some(s => s.done && s.weight && prs[exercise.name] && parseFloat(s.weight) > (prs[exercise.name]?.weight || 0));
 
@@ -56,7 +55,6 @@ export default function ExerciseCard({ exercise, muscleColor, onUpdate, onRemove
               return (
                 <SetRowComp key={s.id} set={s} idx={i}
                   onChange={d => { updSet(s.id, d); if (d.done && !s.done) onSetDone(); }}
-                  onRemove={() => remSet(s.id)}
                   prs={prs} exName={exercise.name} unit={unit}
                   prevSet={prevSet} />
               );
