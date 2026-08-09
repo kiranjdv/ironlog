@@ -4,6 +4,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 :root {
@@ -203,6 +204,9 @@ body {
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
   max-width: calc(100vw - 20px);
   width: auto;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .mobile-dock-inner {
@@ -214,6 +218,7 @@ body {
   -ms-overflow-style: none;
   padding: 2px 2px;
   -webkit-overflow-scrolling: touch;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-dock-inner::-webkit-scrollbar {
@@ -232,7 +237,12 @@ body {
   border: 1.5px solid transparent;
   color: var(--muted);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-focus-ring-color: transparent !important;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.2px;
@@ -241,10 +251,17 @@ body {
   white-space: nowrap;
 }
 
+.dock-item:focus,
+.dock-item:focus-visible,
+.dock-item:active {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
 .dock-item .dock-icon {
   font-size: 21px;
   line-height: 1;
-  transition: transform 0.2s var(--transition-smooth);
+  transition: transform 0.15s ease;
 }
 
 .dock-item:hover:not(.active) {
@@ -256,45 +273,10 @@ body {
   border-color: rgba(200, 255, 0, 0.55);
   color: var(--accent);
   box-shadow: 0 0 14px rgba(200, 255, 0, 0.22), inset 0 0 8px rgba(200, 255, 0, 0.08);
-  animation: dockSquarePop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .dock-item.active .dock-icon {
-  animation: dockIconPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-.dock-item:active {
-  transform: scale(0.92);
-}
-
-@keyframes dockSquarePop {
-  0% {
-    transform: scale(0.88);
-    border-color: rgba(200, 255, 0, 0.2);
-    box-shadow: 0 0 4px rgba(200, 255, 0, 0.1);
-  }
-  60% {
-    transform: scale(1.05);
-    border-color: var(--accent);
-    box-shadow: 0 0 18px var(--accent-glow);
-  }
-  100% {
-    transform: scale(1);
-    border-color: rgba(200, 255, 0, 0.55);
-    box-shadow: 0 0 14px rgba(200, 255, 0, 0.22), inset 0 0 8px rgba(200, 255, 0, 0.08);
-  }
-}
-
-@keyframes dockIconPop {
-  0% {
-    transform: scale(0.85) translateY(0);
-  }
-  50% {
-    transform: scale(1.2) translateY(-2px);
-  }
-  100% {
-    transform: scale(1.12) translateY(-1px);
-  }
+  transform: scale(1.08) translateY(-1px);
 }
 
 /* Layout & Page */
