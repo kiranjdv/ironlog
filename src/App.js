@@ -51,6 +51,8 @@ export default function App() {
     { id: "workout", l: "Workout", icon: "🏋️" },
     { id: "history", l: "History", icon: "📋" },
     { id: "analytics", l: "Stats", icon: "📈" },
+    { id: "planner", l: "Plan", icon: "📅" },
+    { id: "goals", l: "Goals", icon: "🎯" },
     { id: "body", l: "Body", icon: "⚖️" },
     { id: "settings", l: "Settings", icon: "⚙️" },
   ];
