@@ -194,24 +194,26 @@ body {
   left: 50%;
   transform: translateX(-50%);
   background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--glass-border);
-  border-radius: 26px;
-  padding: 5px 6px;
+  border-radius: 30px;
+  padding: 6px 8px;
   z-index: 120;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  max-width: calc(100vw - 16px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+  max-width: calc(100vw - 20px);
   width: auto;
 }
 
 .mobile-dock-inner {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  padding: 2px 2px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mobile-dock-inner::-webkit-scrollbar {
@@ -223,33 +225,40 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 6px 7px;
-  border-radius: 16px;
+  padding: 8px 12px;
+  min-width: 58px;
+  border-radius: 18px;
   background: transparent;
   border: none;
   color: var(--muted);
   cursor: pointer;
-  transition: all 0.25s var(--transition-smooth);
-  font-size: 9.5px;
-  font-weight: 600;
-  gap: 2px;
+  transition: all 0.22s var(--transition-smooth);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  gap: 3px;
   flex-shrink: 0;
   white-space: nowrap;
 }
 
 .dock-item .dock-icon {
-  font-size: 17px;
+  font-size: 22px;
   line-height: 1;
   transition: transform 0.2s var(--transition-smooth);
 }
 
+.dock-item:hover {
+  color: var(--text);
+}
+
 .dock-item.active {
-  background: rgba(200, 255, 0, 0.15);
+  background: rgba(200, 255, 0, 0.16);
   color: var(--accent);
+  box-shadow: 0 0 12px rgba(200, 255, 0, 0.15);
 }
 
 .dock-item.active .dock-icon {
-  transform: scale(1.12) translateY(-1px);
+  transform: scale(1.18) translateY(-1px);
 }
 
 .dock-item:active {
@@ -2254,11 +2263,12 @@ body {
 
 @media (max-width: 400px) {
   .dock-item {
-    padding: 5px 5px;
-    font-size: 8.5px;
+    padding: 7px 10px;
+    font-size: 10.5px;
+    min-width: 52px;
   }
   .dock-item .dock-icon {
-    font-size: 15px;
+    font-size: 20px;
   }
 }
 
