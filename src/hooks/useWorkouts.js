@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { dbGetAll, dbGet, dbPut } from "../utils/db";
+import { dbGetAll, dbGet, dbPut, dbDelete } from "../utils/db";
 import { uid, todayStr, getMuscleForExercise } from "../utils/helpers";
 import { MUSCLE_GROUPS } from "../constants/workoutData";
 
@@ -103,10 +103,20 @@ export function useWorkouts(db, currentUser) {
     await saveTimerOn(false);
   };
 
-  const finishActiveWorkout = async () => {
-    if (active) {
-      active.updatedAt = Date.now();
-      await saveWorkout(active);
+  const deleteWorkout = async (id) => {
+    const updated = workouts.filter((w) => w.id !== id);
+    setWorkouts(updated);
+    if (db) await dbDelete(db, "workouts", id);
+  };
+
+  const finishActiveWorkout = async (completedWorkout) => {
+    const target = completedWorkout || active;
+    if (target) {
+      if (!target.duration && startTime) {
+        target.duration = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+      }
+      target.updatedAt = Date.now();
+      await saveWorkout(target);
     }
     await saveActive(null);
     await saveStartTime(null);
@@ -115,6 +125,6 @@ export function useWorkouts(db, currentUser) {
 
   return {
     workouts, prs, active, startTime, timerOn, loading,
-    saveWorkout, startWorkout, updateActiveWorkout, cancelActiveWorkout, finishActiveWorkout
+    saveWorkout, deleteWorkout, startWorkout, updateActiveWorkout, cancelActiveWorkout, finishActiveWorkout
   };
 }

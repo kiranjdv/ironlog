@@ -6,6 +6,22 @@ export const fmtDate = (d) => new Date(d).toLocaleDateString("en-US", { weekday:
 
 export const fmtTime = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
+export const fmtDuration = (s) => {
+  if (s === undefined || s === null || isNaN(s)) return "—";
+  const sec = parseInt(s, 10);
+  if (sec <= 0) return "0s";
+  const hrs = Math.floor(sec / 3600);
+  const mins = Math.floor((sec % 3600) / 60);
+  const remSec = sec % 60;
+  if (hrs > 0) {
+    return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
+  }
+  if (mins > 0) {
+    return remSec > 0 ? `${mins}m ${remSec}s` : `${mins}m`;
+  }
+  return `${remSec}s`;
+};
+
 export const uid = () => Math.random().toString(36).slice(2, 9);
 
 export function getStreak(ws) {

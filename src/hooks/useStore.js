@@ -70,6 +70,7 @@ export default function useStore() {
     logout: auth.logout,
     workouts: myWorkouts,
     saveWorkout: workoutsHook.saveWorkout,
+    deleteWorkout: workoutsHook.deleteWorkout,
     prs: myPrs,
     bodyLog: myBody,
     addBodyEntry: bodyLogHook.addBodyEntry,

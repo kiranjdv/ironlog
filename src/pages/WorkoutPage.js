@@ -83,7 +83,7 @@ export default function WorkoutPage({ store, setTab }) {
       ...active,
       duration: timer,
     };
-    finishActiveWorkout();
+    finishActiveWorkout(completedSnapshot);
     setShowFinish(false);
     setLastFinishedWorkout(completedSnapshot);
   };
