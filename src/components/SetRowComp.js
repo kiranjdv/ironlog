@@ -1,6 +1,6 @@
 import CheckSVG from "./CheckSVG";
 
-export default function SetRowComp({ set, idx, onChange, prs, exName, unit, prevSet }) {
+export default function SetRowComp({ set, idx, onChange, onDelete, prs, exName, unit, prevSet }) {
   const isWarmup = set.type === "warmup";
   const isSuper = set.type === "superset";
   const isDrop = set.type === "dropset";
@@ -35,7 +35,14 @@ export default function SetRowComp({ set, idx, onChange, prs, exName, unit, prev
       <input className={`set-inp ${isPR ? "pr" : ""}`} type="number" min="0" placeholder={placeholderWeight} value={set.weight} onChange={handleWeightChange} />
       <input className="set-inp" type="number" min="0" placeholder={placeholderReps} value={set.reps} onChange={handleRepsChange} />
       <input className="set-inp" type="number" min="0" placeholder="sets" value={set.sets} onChange={handleSetsChange} />
-      <button className={`set-done ${set.done ? "chk" : ""}`} onClick={() => onChange({ ...set, done: !set.done })}><CheckSVG checked={set.done} /></button>
+      <button className={`set-done ${set.done ? "chk" : ""}`} onClick={() => onChange({ ...set, done: !set.done })} title={set.done ? "Mark Incomplete (Undo)" : "Mark Done"}>
+        <CheckSVG checked={set.done} />
+      </button>
+      {onDelete && (
+        <button className="set-del-btn" onClick={onDelete} title="Delete set" aria-label="Delete set">
+          ✕
+        </button>
+      )}
     </div>
   );
 }

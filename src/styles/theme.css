@@ -509,8 +509,9 @@ body {
 
 .sets-hdr {
   display: grid;
-  grid-template-columns: 46px 1fr 1fr 1fr 38px;
+  grid-template-columns: 44px 1fr 1fr 1fr 34px 24px;
   gap: 8px;
+  align-items: center;
   font-size: 10px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -521,7 +522,7 @@ body {
 
 .set-row {
   display: grid;
-  grid-template-columns: 46px 1fr 1fr 1fr 38px;
+  grid-template-columns: 44px 1fr 1fr 1fr 34px 24px;
   gap: 8px;
   align-items: center;
   margin-bottom: 8px;
@@ -589,8 +590,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
   border: 1.5px solid var(--border);
   cursor: pointer;
@@ -614,6 +615,32 @@ body {
   border-color: var(--accent);
   box-shadow: 0 0 12px var(--accent-glow);
   animation: checkPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.set-del-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s var(--transition-smooth);
+  margin: 0 auto;
+  opacity: 0.6;
+}
+
+.set-del-btn:hover {
+  opacity: 1;
+  background: rgba(255, 77, 109, 0.15);
+  border-color: rgba(255, 77, 109, 0.35);
+  color: #FF4D6D;
+  transform: scale(1.1);
 }
 
 @keyframes checkPop {
