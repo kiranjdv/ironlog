@@ -225,14 +225,14 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
-  min-width: 58px;
-  border-radius: 18px;
+  padding: 6px 12px;
+  min-width: 56px;
+  border-radius: 16px;
   background: transparent;
-  border: none;
+  border: 1.5px solid transparent;
   color: var(--muted);
   cursor: pointer;
-  transition: all 0.22s var(--transition-smooth);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.2px;
@@ -242,27 +242,59 @@ body {
 }
 
 .dock-item .dock-icon {
-  font-size: 22px;
+  font-size: 21px;
   line-height: 1;
   transition: transform 0.2s var(--transition-smooth);
 }
 
-.dock-item:hover {
+.dock-item:hover:not(.active) {
   color: var(--text);
 }
 
 .dock-item.active {
-  background: rgba(200, 255, 0, 0.16);
+  background: rgba(200, 255, 0, 0.14);
+  border-color: rgba(200, 255, 0, 0.55);
   color: var(--accent);
-  box-shadow: 0 0 12px rgba(200, 255, 0, 0.15);
+  box-shadow: 0 0 14px rgba(200, 255, 0, 0.22), inset 0 0 8px rgba(200, 255, 0, 0.08);
+  animation: dockSquarePop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .dock-item.active .dock-icon {
-  transform: scale(1.18) translateY(-1px);
+  animation: dockIconPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .dock-item:active {
   transform: scale(0.92);
+}
+
+@keyframes dockSquarePop {
+  0% {
+    transform: scale(0.88);
+    border-color: rgba(200, 255, 0, 0.2);
+    box-shadow: 0 0 4px rgba(200, 255, 0, 0.1);
+  }
+  60% {
+    transform: scale(1.05);
+    border-color: var(--accent);
+    box-shadow: 0 0 18px var(--accent-glow);
+  }
+  100% {
+    transform: scale(1);
+    border-color: rgba(200, 255, 0, 0.55);
+    box-shadow: 0 0 14px rgba(200, 255, 0, 0.22), inset 0 0 8px rgba(200, 255, 0, 0.08);
+  }
+}
+
+@keyframes dockIconPop {
+  0% {
+    transform: scale(0.85) translateY(0);
+  }
+  50% {
+    transform: scale(1.2) translateY(-2px);
+  }
+  100% {
+    transform: scale(1.12) translateY(-1px);
+  }
 }
 
 /* Layout & Page */
@@ -2263,12 +2295,13 @@ body {
 
 @media (max-width: 400px) {
   .dock-item {
-    padding: 7px 10px;
-    font-size: 10.5px;
-    min-width: 52px;
+    padding: 5px 8px;
+    font-size: 10px;
+    min-width: 50px;
+    border-radius: 14px;
   }
   .dock-item .dock-icon {
-    font-size: 20px;
+    font-size: 19px;
   }
 }
 
