@@ -11,6 +11,7 @@ import BodyPage from "./pages/BodyPage";
 import PlannerPage from "./pages/PlannerPage";
 import GoalsPage from "./pages/GoalsPage";
 import SettingsPage from "./pages/SettingsPage";
+import { Icon } from "./components/Icons";
 
 export default function App() {
   const store = useStore();
@@ -36,25 +37,25 @@ export default function App() {
   }
 
   const TABS = [
-    { id: "dashboard", l: "Dashboard", icon: "📊" },
-    { id: "workout", l: "Workout", icon: "🏋️" },
-    { id: "history", l: "History", icon: "📋" },
-    { id: "analytics", l: "Analytics", icon: "📈" },
-    { id: "body", l: "Body", icon: "⚖️" },
-    { id: "planner", l: "Planner", icon: "📅" },
-    { id: "goals", l: "Goals", icon: "🎯" },
-    { id: "settings", l: "Settings", icon: "⚙️" },
+    { id: "dashboard", l: "Dashboard", icon: "dashboard" },
+    { id: "workout", l: "Workout", icon: "workout" },
+    { id: "history", l: "History", icon: "history" },
+    { id: "analytics", l: "Analytics", icon: "analytics" },
+    { id: "body", l: "Body", icon: "body" },
+    { id: "planner", l: "Planner", icon: "planner" },
+    { id: "goals", l: "Goals", icon: "goals" },
+    { id: "settings", l: "Settings", icon: "settings" },
   ];
 
   const MOBILE_DOCK_TABS = [
-    { id: "dashboard", l: "Home", icon: "📊" },
-    { id: "workout", l: "Workout", icon: "🏋️" },
-    { id: "history", l: "History", icon: "📋" },
-    { id: "analytics", l: "Stats", icon: "📈" },
-    { id: "planner", l: "Plan", icon: "📅" },
-    { id: "goals", l: "Goals", icon: "🎯" },
-    { id: "body", l: "Body", icon: "⚖️" },
-    { id: "settings", l: "Settings", icon: "⚙️" },
+    { id: "dashboard", l: "Home", icon: "dashboard" },
+    { id: "workout", l: "Workout", icon: "workout" },
+    { id: "history", l: "History", icon: "history" },
+    { id: "analytics", l: "Stats", icon: "analytics" },
+    { id: "planner", l: "Plan", icon: "planner" },
+    { id: "goals", l: "Goals", icon: "goals" },
+    { id: "body", l: "Body", icon: "body" },
+    { id: "settings", l: "Settings", icon: "settings" },
   ];
 
   return (
@@ -86,8 +87,10 @@ export default function App() {
                   key={t.id}
                   className={`nav-tab ${tab === t.id ? "active" : ""}`}
                   onClick={() => setTab(t.id)}
+                  style={{ display: "flex", alignItems: "center", gap: "6px" }}
                 >
-                  {t.l}
+                  <Icon name={t.icon} size={15} />
+                  <span>{t.l}</span>
                 </button>
               ))}
             </div>
@@ -122,7 +125,9 @@ export default function App() {
                   className={`dock-item ${tab === t.id ? "active" : ""}`}
                   onClick={() => setTab(t.id)}
                 >
-                  <span className="dock-icon">{t.icon}</span>
+                  <span className="dock-icon">
+                    <Icon name={t.icon} size={18} />
+                  </span>
                   <span>{t.l}</span>
                 </button>
               ))}
