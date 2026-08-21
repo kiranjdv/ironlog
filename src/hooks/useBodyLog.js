@@ -11,6 +11,12 @@ export function useBodyLog(db, currentUser) {
     async function loadBodyLog() {
       try {
         const bodyArray = await dbGetAll(db, "bodyLog");
+        bodyArray.sort((a, b) => {
+          if (a.date !== b.date) {
+            return (a.date || "").localeCompare(b.date || "");
+          }
+          return (a.updatedAt || 0) - (b.updatedAt || 0);
+        });
         setBodyLog(bodyArray);
       } catch (err) {
         console.error("Failed to load body log state", err);
@@ -24,6 +30,12 @@ export function useBodyLog(db, currentUser) {
   const addBodyEntry = async (entry) => {
     const newEntry = { ...entry, user: currentUser, id: uid(), date: todayStr(), updatedAt: Date.now() };
     const updated = [...bodyLog, newEntry];
+    updated.sort((a, b) => {
+      if (a.date !== b.date) {
+        return (a.date || "").localeCompare(b.date || "");
+      }
+      return (a.updatedAt || 0) - (b.updatedAt || 0);
+    });
     setBodyLog(updated);
     if (db) await dbPut(db, "bodyLog", newEntry);
   };
