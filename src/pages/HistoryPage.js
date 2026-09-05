@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MUSCLE_GROUPS } from "../constants/workoutData";
 import { fmtDate, fmtDuration } from "../utils/helpers";
+import { Icon } from "../components/Icons";
 
 export default function HistoryPage({ store, setTab }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -73,7 +74,9 @@ export default function HistoryPage({ store, setTab }) {
         <div className="page-title">HISTORY</div>
         <div className="page-sub">Your training timeline</div>
         <div className="empty-state-card">
-          <div className="empty-icon-wrap">📋</div>
+          <div className="empty-icon-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)" }}>
+            <Icon name="clipboard" size={38} />
+          </div>
           <div className="empty-state-title">NO WORKOUTS RECORDED YET</div>
           <div className="empty-state-text">
             Start logging your workouts to build your history, streaks, and personal records.
@@ -100,7 +103,9 @@ export default function HistoryPage({ store, setTab }) {
       {/* Filter and Search Controls */}
       <div className="hist-filter-card mb20">
         <div className="hist-search-wrap">
-          <span className="hist-search-icon">🔍</span>
+          <span className="hist-search-icon" style={{ display: "flex", alignItems: "center" }}>
+            <Icon name="search" size={15} />
+          </span>
           <input
             type="text"
             className="hist-search-input"
@@ -156,7 +161,9 @@ export default function HistoryPage({ store, setTab }) {
 
       {filteredWorkouts.length === 0 ? (
         <div className="empty-state-card">
-          <div className="empty-icon-wrap">🔍</div>
+          <div className="empty-icon-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)" }}>
+            <Icon name="search" size={38} />
+          </div>
           <div className="empty-state-title">NO MATCHING WORKOUTS</div>
           <div className="empty-state-text">
             No workouts found matching "{searchQuery || selectedMuscle}". Try adjusting your filters.
@@ -225,11 +232,15 @@ export default function HistoryPage({ store, setTab }) {
                 }}
               >
                 <div className="hist-header-left">
-                  <div className="hist-date-icon">📅</div>
+                  <div className="hist-date-icon" style={{ color: "var(--accent)" }}>
+                    <Icon name="calendar" size={22} />
+                  </div>
                   <div>
                     <div className="hist-date">{fmtDate(w.date)}</div>
                     <div className="hist-time-tag">
-                      <span className="hist-time-icon">⏱️</span>
+                      <span className="hist-time-icon" style={{ display: "inline-flex", alignItems: "center" }}>
+                        <Icon name="time" size={13} />
+                      </span>
                       <span>
                         Time taken:{" "}
                         <strong style={{ color: "var(--accent)" }}>
@@ -299,8 +310,9 @@ export default function HistoryPage({ store, setTab }) {
                         className="hist-delete-btn"
                         onClick={() => setDeleteConfirmId(w.id)}
                         title="Delete workout"
+                        style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                       >
-                        🗑️
+                        <Icon name="trash" size={15} />
                       </button>
                     )}
                   </div>
