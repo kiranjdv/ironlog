@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ACHIEVEMENTS } from "../constants/workoutData";
+import { Icon } from "../components/Icons";
 
 export default function GoalsPage({ store, setTab }) {
   const [showAdd, setShowAdd] = useState(false);
@@ -59,7 +60,17 @@ export default function GoalsPage({ store, setTab }) {
               key={a.id}
               className={`ach-card ${earned ? "earned" : "locked"}`}
             >
-              <div className="ach-icon">{a.icon}</div>
+              <div
+                className="ach-icon"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: earned ? "var(--accent)" : "var(--muted)",
+                }}
+              >
+                <Icon name={a.icon} size={32} />
+              </div>
               <div className="ach-name">{a.name}</div>
               <div className="ach-desc">{a.desc}</div>
               {earned && (
@@ -91,7 +102,17 @@ export default function GoalsPage({ store, setTab }) {
 
       {store.goals.length === 0 ? (
         <div className="empty-state-card">
-          <div className="empty-icon-wrap">🎯</div>
+          <div
+            className="empty-icon-wrap"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--muted)",
+            }}
+          >
+            <Icon name="goals" size={38} />
+          </div>
           <div className="empty-state-title">NO GOALS SET YET</div>
           <div className="empty-state-text">
             Setting targets on key compound lifts keeps you accountable and motivated.

@@ -1,5 +1,6 @@
 import { MUSCLE_GROUPS } from "../constants/workoutData";
 import { getStreak, todayStr, DAYS_SHORT } from "../utils/helpers";
+import { Icon } from "../components/Icons";
 
 export default function DashboardPage({ store, setTab }) {
   const ws = store.workouts;
@@ -171,7 +172,9 @@ export default function DashboardPage({ store, setTab }) {
                   boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
                 }}
               >
-                <span style={{ fontSize: 20 }}>{a.icon}</span>
+                <span style={{ color: "var(--accent)", display: "flex", alignItems: "center" }}>
+                  <Icon name={a.icon} size={20} />
+                </span>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 700 }}>{a.name}</div>
                   <div style={{ fontSize: 10, color: "var(--muted)" }}>{a.desc}</div>

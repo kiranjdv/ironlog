@@ -21,10 +21,10 @@ export const WORKOUT_TEMPLATES = {
 };
 
 export const ACHIEVEMENTS = [
-  { id: "first_workout", icon: "🏆", name: "First Blood", desc: "Complete your first workout", check: (ws) => ws.length >= 1 },
-  { id: "week_streak", icon: "🔥", name: "Week Warrior", desc: "Workout 7 days in a row", check: (ws) => getStreak(ws) >= 7 },
-  { id: "ten_workouts", icon: "💪", name: "Dedicated", desc: "Complete 10 workouts", check: (ws) => ws.length >= 10 },
-  { id: "pr_club", icon: "⚡", name: "PR Club", desc: "Set your first Personal Record", check: (_, prs) => Object.keys(prs).length >= 1 },
-  { id: "all_muscles", icon: "🦾", name: "Full Body", desc: "Train all 6 muscle groups", check: (ws) => new Set(ws.flatMap(w => w.exercises.map(e => e.muscle))).size >= 6 },
-  { id: "century", icon: "💯", name: "Century", desc: "Log 100 total sets", check: (ws) => ws.reduce((a, w) => a + w.exercises.reduce((b, e) => b + e.sets.filter(s => s.done).length, 0), 0) >= 100 },
+  { id: "first_workout", icon: "trophy", name: "First Blood", desc: "Complete your first workout", check: (ws) => ws.length >= 1 },
+  { id: "week_streak", icon: "flame", name: "Week Warrior", desc: "Workout 7 days in a row", check: (ws) => getStreak(ws) >= 7 },
+  { id: "ten_workouts", icon: "award", name: "Dedicated", desc: "Complete 10 workouts", check: (ws) => ws.length >= 10 },
+  { id: "pr_club", icon: "zap", name: "PR Club", desc: "Set your first Personal Record", check: (_, prs) => Object.keys(prs).length >= 1 },
+  { id: "all_muscles", icon: "shield", name: "Full Body", desc: "Train all 6 muscle groups", check: (ws) => new Set(ws.flatMap(w => w.exercises.map(e => e.muscle))).size >= 6 },
+  { id: "century", icon: "crown", name: "Century", desc: "Log 100 total sets", check: (ws) => ws.reduce((a, w) => a + w.exercises.reduce((b, e) => b + e.sets.filter(s => s.done).length, 0), 0) >= 100 },
 ];
