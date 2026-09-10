@@ -50,7 +50,7 @@ export default function DashboardPage({ store, setTab }) {
         <div>
           <div className="page-title">DASHBOARD</div>
           <div className="page-sub">
-            Keep pushing, {store.user?.name?.split(" ")[0] || "Athlete"} 🔥
+            Keep pushing, {store.user?.name?.split(" ")[0] || "Athlete"}
           </div>
         </div>
         {setTab && (
@@ -63,7 +63,7 @@ export default function DashboardPage({ store, setTab }) {
       <div className="stats-row">
         {[
           { l: "Total Workouts", v: totalDays, d: "sessions", c: "var(--accent)" },
-          { l: "Streak", v: streak, d: "days 🔥", c: "#F59E0B" },
+          { l: "Streak", v: streak, d: "days", c: "#F59E0B" },
           { l: "This Week", v: thisWeek.length, d: "workouts", c: "#A855F7" },
           { l: "Sets Done", v: totalSets, d: "total", c: "#4D9FFF" },
         ].map((s) => (
@@ -187,7 +187,17 @@ export default function DashboardPage({ store, setTab }) {
 
       {ws.length === 0 && (
         <div className="empty-state-card">
-          <div className="empty-icon-wrap">🏋️</div>
+          <div
+            className="empty-icon-wrap"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--accent)",
+            }}
+          >
+            <Icon name="workout" size={28} />
+          </div>
           <div className="empty-state-title">READY FOR YOUR FIRST WORKOUT?</div>
           <div className="empty-state-text">
             Log your workouts to unlock frequency charts, streak heatmaps, and achievement badges!
