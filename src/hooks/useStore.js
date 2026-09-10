@@ -76,6 +76,7 @@ export default function useStore() {
     addBodyEntry: bodyLogHook.addBodyEntry,
     goals: myGoals,
     addGoal: goalsHook.addGoal,
+    updateGoal: goalsHook.updateGoal,
     deleteGoal: goalsHook.deleteGoal,
     customExercises: myCustomEx,
     addCustomExercise: customExHook.addCustomExercise,

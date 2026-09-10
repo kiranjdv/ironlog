@@ -28,11 +28,18 @@ export function useGoals(db, currentUser) {
     if (db) await dbPut(db, "goals", newGoal);
   };
 
+  const updateGoal = async (goal) => {
+    const updatedGoal = { ...goal, updatedAt: Date.now() };
+    const updated = goals.map((g) => (g.id === goal.id ? updatedGoal : g));
+    setGoals(updated);
+    if (db) await dbPut(db, "goals", updatedGoal);
+  };
+
   const deleteGoal = async (id) => {
     const updated = goals.filter(g => g.id !== id);
     setGoals(updated);
     if (db) await dbDelete(db, "goals", id);
   };
 
-  return { goals, loading, addGoal, deleteGoal };
+  return { goals, loading, addGoal, updateGoal, deleteGoal };
 }

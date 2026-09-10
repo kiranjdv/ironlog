@@ -21,10 +21,83 @@ export const WORKOUT_TEMPLATES = {
 };
 
 export const ACHIEVEMENTS = [
-  { id: "first_workout", icon: "trophy", name: "First Blood", desc: "Complete your first workout", check: (ws) => ws.length >= 1 },
-  { id: "week_streak", icon: "flame", name: "Week Warrior", desc: "Workout 7 days in a row", check: (ws) => getStreak(ws) >= 7 },
-  { id: "ten_workouts", icon: "award", name: "Dedicated", desc: "Complete 10 workouts", check: (ws) => ws.length >= 10 },
-  { id: "pr_club", icon: "zap", name: "PR Club", desc: "Set your first Personal Record", check: (_, prs) => Object.keys(prs).length >= 1 },
-  { id: "all_muscles", icon: "shield", name: "Full Body", desc: "Train all 6 muscle groups", check: (ws) => new Set(ws.flatMap(w => w.exercises.map(e => e.muscle))).size >= 6 },
-  { id: "century", icon: "crown", name: "Century", desc: "Log 100 total sets", check: (ws) => ws.reduce((a, w) => a + w.exercises.reduce((b, e) => b + e.sets.filter(s => s.done).length, 0), 0) >= 100 },
+  {
+    id: "first_workout",
+    icon: "trophy",
+    name: "First Blood",
+    desc: "Complete your first workout",
+    check: (ws) => (ws || []).length >= 1,
+    progress: (ws) => ({ current: Math.min((ws || []).length, 1), max: 1, unit: "workout" })
+  },
+  {
+    id: "week_streak",
+    icon: "flame",
+    name: "Week Warrior",
+    desc: "Workout 7 days in a row",
+    check: (ws) => getStreak(ws || []) >= 7,
+    progress: (ws) => ({ current: Math.min(getStreak(ws || []), 7), max: 7, unit: "days" })
+  },
+  {
+    id: "ten_workouts",
+    icon: "award",
+    name: "Dedicated",
+    desc: "Complete 10 workouts",
+    check: (ws) => (ws || []).length >= 10,
+    progress: (ws) => ({ current: Math.min((ws || []).length, 10), max: 10, unit: "workouts" })
+  },
+  {
+    id: "pr_club",
+    icon: "zap",
+    name: "PR Club",
+    desc: "Set your first Personal Record",
+    check: (_, prs) => Object.keys(prs || {}).length >= 1,
+    progress: (_, prs) => ({ current: Math.min(Object.keys(prs || {}).length, 1), max: 1, unit: "PR" })
+  },
+  {
+    id: "all_muscles",
+    icon: "shield",
+    name: "Full Body",
+    desc: "Train all 6 muscle groups",
+    check: (ws) => new Set((ws || []).flatMap(w => (w.exercises || []).map(e => e.muscle))).size >= 6,
+    progress: (ws) => ({ current: Math.min(new Set((ws || []).flatMap(w => (w.exercises || []).map(e => e.muscle))).size, 6), max: 6, unit: "muscles" })
+  },
+  {
+    id: "century",
+    icon: "crown",
+    name: "Century",
+    desc: "Log 100 total sets",
+    check: (ws) => (ws || []).reduce((a, w) => a + (w.exercises || []).reduce((b, e) => b + (e.sets || []).filter(s => s.done).length, 0), 0) >= 100,
+    progress: (ws) => {
+      const sets = (ws || []).reduce((a, w) => a + (w.exercises || []).reduce((b, e) => b + (e.sets || []).filter(s => s.done).length, 0), 0);
+      return { current: Math.min(sets, 100), max: 100, unit: "sets" };
+    }
+  },
+  {
+    id: "twentyfive_workouts",
+    icon: "star",
+    name: "Iron Will",
+    desc: "Complete 25 total workouts",
+    check: (ws) => (ws || []).length >= 25,
+    progress: (ws) => ({ current: Math.min((ws || []).length, 25), max: 25, unit: "workouts" })
+  },
+  {
+    id: "sbd_total",
+    icon: "dumbbell",
+    name: "SBD Milestone",
+    desc: "Total 250kg combined PR across Squat, Bench & Deadlift",
+    check: (_, prs = {}) => {
+      const s = prs["Squat"]?.weight || 0;
+      const b = prs["Bench Press"]?.weight || 0;
+      const d = prs["Deadlift"]?.weight || 0;
+      return (s + b + d) >= 250;
+    },
+    progress: (_, prs = {}) => {
+      const s = prs["Squat"]?.weight || 0;
+      const b = prs["Bench Press"]?.weight || 0;
+      const d = prs["Deadlift"]?.weight || 0;
+      const total = Math.round(s + b + d);
+      return { current: Math.min(total, 250), max: 250, unit: "kg" };
+    }
+  }
 ];
+
