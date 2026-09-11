@@ -110,8 +110,7 @@ export default function WorkoutPage({ store, setTab }) {
             style={{ "--sc": "var(--accent)", cursor: "pointer" }}
             onClick={() => startWorkout(null)}
           >
-            <div style={{ padding: "16px 8px", textAlign: "center" }}>
-              <div style={{ fontSize: 44, marginBottom: 12 }}>⚡</div>
+            <div style={{ padding: "24px 16px", textAlign: "center" }}>
               <div
                 style={{
                   fontFamily: "'Bebas Neue',sans-serif",
