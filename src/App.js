@@ -90,7 +90,7 @@ export default function App() {
           <nav className="nav">
             <div className="nav-left">
               <div className="nav-logo" onClick={() => navigateTab("dashboard")} style={{ cursor: "pointer" }}>
-                ⚡ IRONLOG
+                IRONLOG
               </div>
               {store.active && (
                 <div
