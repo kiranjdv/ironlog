@@ -1,7 +1,7 @@
 import { useState } from "react";
 import LineChart from "../components/LineChart";
 
-export default function BodyPage({ store }) {
+export default function BodyPage({ store, embedded = false }) {
   const { unit } = store.settings;
   const [form, setForm] = useState({ weight: "", bodyFat: "", chest: "", waist: "", hips: "", arms: "", legs: "" });
   const [saved, setSaved] = useState(false);
@@ -25,10 +25,15 @@ export default function BodyPage({ store }) {
     setSaved(true); setTimeout(() => setSaved(false), 2000);
   };
   const weightData = store.bodyLog.filter(b => b.weight).slice(-10).map(b => ({ x: b.date?.slice(5) || "", y: parseFloat(b.weight) }));
-  return (
-    <div className="page">
-      <div className="page-title">BODY TRACKING</div>
-      <div className="page-sub">Monitor your physique</div>
+
+  const mainContent = (
+    <>
+      {!embedded && (
+        <>
+          <div className="page-title">BODY TRACKING</div>
+          <div className="page-sub">Monitor your physique</div>
+        </>
+      )}
       {Object.keys(latest).length > 0 && (
         <>
           <div className="sec-lbl">LATEST MEASUREMENTS</div>
@@ -58,6 +63,13 @@ export default function BodyPage({ store }) {
           <button className="btn btn-acc mt16" style={{ padding: "11px 26px" }} onClick={save} disabled={isInvalid}>{saved ? "✓ Saved!" : "Save Measurements"}</button>
         </div>
       </div>
-    </div>
+    </>
   );
+
+  if (embedded) {
+    return <div className="body-tab-content">{mainContent}</div>;
+  }
+
+  return <div className="page">{mainContent}</div>;
 }
+

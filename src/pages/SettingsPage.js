@@ -1,13 +1,26 @@
 import { useState, useEffect, useRef } from "react";
 import { fmtDate } from "../utils/helpers";
 import { dbGet, dbGetAll, dbPut, dbClear } from "../utils/db";
+import BodyPage from "./BodyPage";
+import { Icon } from "../components/Icons";
 
-export default function SettingsPage({ store }) {
+export default function SettingsPage({ store, subTab, setSubTab }) {
   const { settings, saveSettings } = store;
+  const [internalSubTab, setInternalSubTab] = useState(subTab || "general");
+  const currentSubTab = subTab !== undefined ? subTab : internalSubTab;
+
+  const handleSubTabChange = (tabKey) => {
+    if (setSubTab) setSubTab(tabKey);
+    setInternalSubTab(tabKey);
+  };
+
+  const latestBody = store.bodyLog?.slice(-1)[0];
+
   const [exportDone, setExportDone] = useState(false);
   const [backupDone, setBackupDone] = useState(false);
   const [persistent, setPersistent] = useState(false);
   const fileInputRef = useRef(null);
+
 
   useEffect(() => {
     if (navigator.storage && navigator.storage.persisted) {
@@ -271,44 +284,82 @@ export default function SettingsPage({ store }) {
   return (
     <div className="page">
       <div className="page-title">SETTINGS</div>
-      <div className="page-sub">Customize your experience</div>
-      <div className="panel mb20">
-        <div style={{ padding: 18 }}>
-          <div className="sec-lbl">PROFILE & SETTINGS</div>
-          <div className="flex gap12 mb16">
-            <div className="avatar" style={{ width: 52, height: 52, fontSize: 20 }}>{store.user?.name?.[0]?.toUpperCase() || "A"}</div>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>{store.user?.name}</div>
-              <div style={{ color: "var(--muted)", fontSize: 12 }}>{store.currentUser}</div>
-              <div style={{ color: "var(--muted)", fontSize: 11, marginTop: 2 }}>{store.workouts.length} workouts logged</div>
-            </div>
-          </div>
-          {settingsRows.map((r, i) => (
-            <div key={r.l} className="setting-row" style={i === settingsRows.length - 1 ? { borderBottom: "none" } : {}}>
-              <div>
-                <div className="setting-lbl">{r.l}</div>
-                <div className="setting-sub">{r.s}</div>
-              </div>
-              {r.el}
-            </div>
-          ))}
+      <div className="page-sub">
+        {currentSubTab === "general"
+          ? "Customize your profile and app preferences"
+          : "Monitor your physique and body measurements"}
+      </div>
+
+      {/* Segmented Control Sub-Nav */}
+      <div className="settings-subnav-container">
+        <div className="settings-subnav">
+          <button
+            type="button"
+            className={`settings-subnav-btn ${currentSubTab === "general" ? "active" : ""}`}
+            onClick={() => handleSubTabChange("general")}
+          >
+            <Icon name="settings" size={15} />
+            <span>Preferences & Profile</span>
+          </button>
+          <button
+            type="button"
+            className={`settings-subnav-btn ${currentSubTab === "body" ? "active" : ""}`}
+            onClick={() => handleSubTabChange("body")}
+          >
+            <Icon name="body" size={15} />
+            <span>Body Tracking</span>
+            {latestBody?.weight && (
+              <span className="settings-subnav-badge">
+                {latestBody.weight} {store.settings?.unit || "kg"}
+              </span>
+            )}
+          </button>
         </div>
       </div>
-      {Object.keys(store.prs).length > 0 && (
-        <div className="panel">
-          <div style={{ padding: 18 }}>
-            <div className="sec-lbl">PERSONAL RECORDS</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 9 }}>
-              {Object.entries(store.prs).sort((a, b) => b[1].weight - a[1].weight).map(([ex, pr]) => (
-                <div key={ex} style={{ background: "var(--surface)", borderRadius: 10, padding: "11px 13px", border: "1px solid var(--border)" }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 3 }}>{ex}</div>
-                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "var(--accent)" }}>{pr.weight}{store.settings.unit} × {pr.reps}</div>
-                  <div style={{ fontSize: 10, color: "var(--muted)", marginTop: 2 }}>{fmtDate(pr.date)}</div>
+
+      {currentSubTab === "body" ? (
+        <BodyPage store={store} embedded={true} />
+      ) : (
+        <>
+          <div className="panel mb20">
+            <div style={{ padding: 18 }}>
+              <div className="sec-lbl">PROFILE & SETTINGS</div>
+              <div className="flex gap12 mb16">
+                <div className="avatar" style={{ width: 52, height: 52, fontSize: 20 }}>{store.user?.name?.[0]?.toUpperCase() || "A"}</div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 15 }}>{store.user?.name}</div>
+                  <div style={{ color: "var(--muted)", fontSize: 12 }}>{store.currentUser}</div>
+                  <div style={{ color: "var(--muted)", fontSize: 11, marginTop: 2 }}>{store.workouts.length} workouts logged</div>
+                </div>
+              </div>
+              {settingsRows.map((r, i) => (
+                <div key={r.l} className="setting-row" style={i === settingsRows.length - 1 ? { borderBottom: "none" } : {}}>
+                  <div>
+                    <div className="setting-lbl">{r.l}</div>
+                    <div className="setting-sub">{r.s}</div>
+                  </div>
+                  {r.el}
                 </div>
               ))}
             </div>
           </div>
-        </div>
+          {Object.keys(store.prs).length > 0 && (
+            <div className="panel">
+              <div style={{ padding: 18 }}>
+                <div className="sec-lbl">PERSONAL RECORDS</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 9 }}>
+                  {Object.entries(store.prs).sort((a, b) => b[1].weight - a[1].weight).map(([ex, pr]) => (
+                    <div key={ex} style={{ background: "var(--surface)", borderRadius: 10, padding: "11px 13px", border: "1px solid var(--border)" }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 3 }}>{ex}</div>
+                      <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "var(--accent)" }}>{pr.weight}{store.settings.unit} × {pr.reps}</div>
+                      <div style={{ fontSize: 10, color: "var(--muted)", marginTop: 2 }}>{fmtDate(pr.date)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

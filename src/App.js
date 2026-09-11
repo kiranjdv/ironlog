@@ -6,7 +6,6 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import WorkoutPage from "./pages/WorkoutPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
-import BodyPage from "./pages/BodyPage";
 import PlannerPage from "./pages/PlannerPage";
 import GoalsPage from "./pages/GoalsPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -16,16 +15,23 @@ export default function App() {
   const store = useStore();
   const [tab, setTab] = useState("dashboard");
   const [analyticsSubTab, setAnalyticsSubTab] = useState("insights");
+  const [settingsSubTab, setSettingsSubTab] = useState("general");
   const dark = store.settings?.theme !== "light";
 
   const navigateTab = (targetTab, subTabKey = null) => {
     if (targetTab === "history") {
       setTab("analytics");
       setAnalyticsSubTab("history");
+    } else if (targetTab === "body") {
+      setTab("settings");
+      setSettingsSubTab("body");
     } else {
       setTab(targetTab);
       if (targetTab === "analytics" && subTabKey) {
         setAnalyticsSubTab(subTabKey);
+      }
+      if (targetTab === "settings" && subTabKey) {
+        setSettingsSubTab(subTabKey);
       }
     }
   };
@@ -52,7 +58,6 @@ export default function App() {
     { id: "dashboard", l: "Dashboard", icon: "dashboard" },
     { id: "workout", l: "Workout", icon: "workout" },
     { id: "analytics", l: "Analytics", icon: "analytics" },
-    { id: "body", l: "Body", icon: "body" },
     { id: "planner", l: "Planner", icon: "planner" },
     { id: "goals", l: "Goals", icon: "goals" },
     { id: "settings", l: "Settings", icon: "settings" },
@@ -62,13 +67,19 @@ export default function App() {
     { id: "dashboard", l: "Home", icon: "dashboard" },
     { id: "workout", l: "Workout", icon: "workout" },
     { id: "analytics", l: "Analytics", icon: "analytics" },
-    { id: "body", l: "Body", icon: "body" },
     { id: "planner", l: "Plan", icon: "planner" },
     { id: "goals", l: "Goals", icon: "goals" },
     { id: "settings", l: "Settings", icon: "settings" },
   ];
 
   const isAnalyticsActive = tab === "analytics" || tab === "history";
+  const isSettingsActive = tab === "settings" || tab === "body";
+
+  const checkTabActive = (tabId) => {
+    if (tabId === "analytics") return isAnalyticsActive;
+    if (tabId === "settings") return isSettingsActive;
+    return tab === tabId;
+  };
 
   return (
     <div className="app">
@@ -97,7 +108,7 @@ export default function App() {
               {TABS.map((t) => (
                 <button
                   key={t.id}
-                  className={`nav-tab ${(t.id === "analytics" ? isAnalyticsActive : tab === t.id) ? "active" : ""}`}
+                  className={`nav-tab ${checkTabActive(t.id) ? "active" : ""}`}
                   onClick={() => navigateTab(t.id)}
                   style={{ display: "flex", alignItems: "center", gap: "6px" }}
                 >
@@ -129,10 +140,16 @@ export default function App() {
               setSubTab={setAnalyticsSubTab}
             />
           )}
-          {tab === "body" && <BodyPage store={store} />}
           {tab === "planner" && <PlannerPage store={store} />}
           {tab === "goals" && <GoalsPage store={store} setTab={navigateTab} />}
-          {tab === "settings" && <SettingsPage store={store} />}
+          {isSettingsActive && (
+            <SettingsPage
+              store={store}
+              setTab={navigateTab}
+              subTab={tab === "body" ? "body" : settingsSubTab}
+              setSubTab={setSettingsSubTab}
+            />
+          )}
 
           {/* Floating Mobile Bottom Dock */}
           <nav className="mobile-dock">
@@ -140,7 +157,7 @@ export default function App() {
               {MOBILE_DOCK_TABS.map((t) => (
                 <button
                   key={t.id}
-                  className={`dock-item ${(t.id === "analytics" ? isAnalyticsActive : tab === t.id) ? "active" : ""}`}
+                  className={`dock-item ${checkTabActive(t.id) ? "active" : ""}`}
                   onClick={() => navigateTab(t.id)}
                 >
                   <span className="dock-icon">
