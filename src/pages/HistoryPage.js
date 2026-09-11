@@ -3,7 +3,7 @@ import { MUSCLE_GROUPS } from "../constants/workoutData";
 import { fmtDate, fmtDuration } from "../utils/helpers";
 import { Icon } from "../components/Icons";
 
-export default function HistoryPage({ store, setTab }) {
+export default function HistoryPage({ store, setTab, embedded = false }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMuscle, setSelectedMuscle] = useState("All");
   const [expandedIds, setExpandedIds] = useState(new Set());
@@ -69,36 +69,46 @@ export default function HistoryPage({ store, setTab }) {
   }, 0);
 
   if (!ws.length) {
+    const emptyStateNode = (
+      <div className="empty-state-card">
+        <div className="empty-icon-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)" }}>
+          <Icon name="clipboard" size={38} />
+        </div>
+        <div className="empty-state-title">NO WORKOUTS RECORDED YET</div>
+        <div className="empty-state-text">
+          Start logging your workouts to build your history, streaks, and personal records.
+        </div>
+        {setTab && (
+          <button className="btn btn-acc" onClick={() => setTab("workout")}>
+            Start a Workout Now ➔
+          </button>
+        )}
+      </div>
+    );
+
+    if (embedded) {
+      return <div className="history-tab-content">{emptyStateNode}</div>;
+    }
+
     return (
       <div className="page">
         <div className="page-title">HISTORY</div>
         <div className="page-sub">Your training timeline</div>
-        <div className="empty-state-card">
-          <div className="empty-icon-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)" }}>
-            <Icon name="clipboard" size={38} />
-          </div>
-          <div className="empty-state-title">NO WORKOUTS RECORDED YET</div>
-          <div className="empty-state-text">
-            Start logging your workouts to build your history, streaks, and personal records.
-          </div>
-          {setTab && (
-            <button className="btn btn-acc" onClick={() => setTab("workout")}>
-              Start a Workout Now ➔
-            </button>
-          )}
-        </div>
+        {emptyStateNode}
       </div>
     );
   }
 
   const allMuscles = ["All", ...Object.keys(MUSCLE_GROUPS)];
 
-  return (
-    <div className="page">
-      <div className="page-title">HISTORY</div>
-      <div className="page-sub">
-        {totalCompletedWorkouts} workout{totalCompletedWorkouts !== 1 ? "s" : ""} logged • {Math.round(grandTotalVolume).toLocaleString()} {unit} total volume lifted
-      </div>
+  const mainContent = (
+    <>
+      {!embedded && (
+        <div className="page-sub">
+          {totalCompletedWorkouts} workout{totalCompletedWorkouts !== 1 ? "s" : ""} logged • {Math.round(grandTotalVolume).toLocaleString()} {unit} total volume lifted
+        </div>
+      )}
+
 
       {/* Filter and Search Controls */}
       <div className="hist-filter-card mb20">
@@ -500,6 +510,18 @@ export default function HistoryPage({ store, setTab }) {
           );
         })
       )}
+    </>
+  );
+
+  if (embedded) {
+    return <div className="history-tab-content">{mainContent}</div>;
+  }
+
+  return (
+    <div className="page">
+      <div className="page-title">HISTORY</div>
+      {mainContent}
     </div>
   );
 }
+

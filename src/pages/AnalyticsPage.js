@@ -2,10 +2,20 @@ import { useState } from "react";
 import { MUSCLE_GROUPS } from "../constants/workoutData";
 import { getStreak } from "../utils/helpers";
 import LineChart from "../components/LineChart";
+import HistoryPage from "./HistoryPage";
+import { Icon } from "../components/Icons";
 
-export default function AnalyticsPage({ store }) {
+export default function AnalyticsPage({ store, setTab, subTab, setSubTab }) {
   const ws = store.workouts;
   const { unit } = store.settings;
+  const [internalSubTab, setInternalSubTab] = useState(subTab || "insights");
+  const currentSubTab = subTab !== undefined ? subTab : internalSubTab;
+
+  const handleSubTabChange = (tabKey) => {
+    if (setSubTab) setSubTab(tabKey);
+    setInternalSubTab(tabKey);
+  };
+
   const [selEx, setSelEx] = useState("");
   const allExNames = [...new Set(ws.flatMap(w => w.exercises.map(e => e.name)))];
   const progressData = selEx
@@ -51,11 +61,45 @@ export default function AnalyticsPage({ store }) {
       prevMonth = mName;
     }
   }
+
   return (
     <div className="page">
       <div className="page-title">ANALYTICS</div>
-      <div className="page-sub">Deep performance insights</div>
-      <div className="stats-row">
+      <div className="page-sub">
+        {currentSubTab === "insights"
+          ? "Deep performance insights & progression"
+          : "Your complete training timeline and workout logs"}
+      </div>
+
+      {/* Segmented Control Sub-Nav */}
+      <div className="analytics-subnav-container">
+        <div className="analytics-subnav">
+          <button
+            type="button"
+            className={`analytics-subnav-btn ${currentSubTab === "insights" ? "active" : ""}`}
+            onClick={() => handleSubTabChange("insights")}
+          >
+            <Icon name="analytics" size={15} />
+            <span>Performance Insights</span>
+          </button>
+          <button
+            type="button"
+            className={`analytics-subnav-btn ${currentSubTab === "history" ? "active" : ""}`}
+            onClick={() => handleSubTabChange("history")}
+          >
+            <Icon name="history" size={15} />
+            <span>Workout History</span>
+            <span className="analytics-subnav-badge">{ws.length}</span>
+          </button>
+        </div>
+      </div>
+
+      {currentSubTab === "history" ? (
+        <HistoryPage store={store} setTab={setTab} embedded={true} />
+      ) : (
+        <>
+          <div className="stats-row">
+
         {[{ l: "Current Streak", v: streak, d: "days", c: "#F59E0B" }, { l: "PRs Set", v: Object.keys(store.prs).length, d: "personal records", c: "var(--accent)" }, { l: "Avg/Week", v: ws.length > 0 ? Math.round(ws.length / Math.max(1, Math.ceil((Date.now() - new Date(ws[ws.length - 1]?.date || Date.now())) / 604800000 + 1))) : 0, d: "workouts", c: "#4D9FFF" }, { l: "Total Volume", v: Math.round(ws.reduce((a, w) => a + w.exercises.reduce((b, e) => b + e.sets.filter(s => s.done && s.weight && s.reps).reduce((c, s) => c + parseFloat(s.weight || 0) * parseInt(s.reps || 0), 0), 0), 0)), d: unit, c: "#A855F7" }].map(s => (
           <div key={s.l} className="stat-card" style={{ "--sc": s.c }}><div className="stat-lbl">{s.l}</div><div className="stat-val">{s.v}</div><div className="stat-desc">{s.d}</div></div>
         ))}
@@ -122,6 +166,8 @@ export default function AnalyticsPage({ store }) {
           <div className="panel mb20"><div style={{ padding: 16 }}><div className="bar-chart">{topStrength.map(([ex, score]) => (
             <div key={ex} className="bar-row"><div className="bar-lbl" style={{ fontSize: 10, width: 110 }}>{ex}</div><div className="bar-track"><div className="bar-fill" style={{ width: `${(score / topStrength[0][1]) * 100}%`, background: "var(--accent)" }} /></div><div className="bar-val" style={{ color: "var(--accent)", width: 50 }}>{score}{unit}</div></div>
           ))}</div></div></div>
+        </>
+      )}
         </>
       )}
     </div>

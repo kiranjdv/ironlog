@@ -97,7 +97,7 @@ export default function WorkoutPage({ store, setTab }) {
             onClose={() => setLastFinishedWorkout(null)}
             onNavigateHistory={() => {
               setLastFinishedWorkout(null);
-              if (setTab) setTab("history");
+              if (setTab) setTab("analytics", "history");
             }}
           />
         )}

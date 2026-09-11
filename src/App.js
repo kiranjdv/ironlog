@@ -5,7 +5,6 @@ import useStore from "./hooks/useStore";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import WorkoutPage from "./pages/WorkoutPage";
-import HistoryPage from "./pages/HistoryPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import BodyPage from "./pages/BodyPage";
 import PlannerPage from "./pages/PlannerPage";
@@ -16,7 +15,20 @@ import { Icon } from "./components/Icons";
 export default function App() {
   const store = useStore();
   const [tab, setTab] = useState("dashboard");
+  const [analyticsSubTab, setAnalyticsSubTab] = useState("insights");
   const dark = store.settings?.theme !== "light";
+
+  const navigateTab = (targetTab, subTabKey = null) => {
+    if (targetTab === "history") {
+      setTab("analytics");
+      setAnalyticsSubTab("history");
+    } else {
+      setTab(targetTab);
+      if (targetTab === "analytics" && subTabKey) {
+        setAnalyticsSubTab(subTabKey);
+      }
+    }
+  };
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
@@ -39,7 +51,6 @@ export default function App() {
   const TABS = [
     { id: "dashboard", l: "Dashboard", icon: "dashboard" },
     { id: "workout", l: "Workout", icon: "workout" },
-    { id: "history", l: "History", icon: "history" },
     { id: "analytics", l: "Analytics", icon: "analytics" },
     { id: "body", l: "Body", icon: "body" },
     { id: "planner", l: "Planner", icon: "planner" },
@@ -50,13 +61,14 @@ export default function App() {
   const MOBILE_DOCK_TABS = [
     { id: "dashboard", l: "Home", icon: "dashboard" },
     { id: "workout", l: "Workout", icon: "workout" },
-    { id: "history", l: "History", icon: "history" },
-    { id: "analytics", l: "Stats", icon: "analytics" },
+    { id: "analytics", l: "Analytics", icon: "analytics" },
+    { id: "body", l: "Body", icon: "body" },
     { id: "planner", l: "Plan", icon: "planner" },
     { id: "goals", l: "Goals", icon: "goals" },
-    { id: "body", l: "Body", icon: "body" },
     { id: "settings", l: "Settings", icon: "settings" },
   ];
+
+  const isAnalyticsActive = tab === "analytics" || tab === "history";
 
   return (
     <div className="app">
@@ -66,13 +78,13 @@ export default function App() {
         <>
           <nav className="nav">
             <div className="nav-left">
-              <div className="nav-logo" onClick={() => setTab("dashboard")} style={{ cursor: "pointer" }}>
+              <div className="nav-logo" onClick={() => navigateTab("dashboard")} style={{ cursor: "pointer" }}>
                 ⚡ IRONLOG
               </div>
               {store.active && (
                 <div
                   className="nav-live-badge"
-                  onClick={() => setTab("workout")}
+                  onClick={() => navigateTab("workout")}
                   title="Workout in progress — click to return"
                 >
                   <span className="live-dot"></span>
@@ -85,8 +97,8 @@ export default function App() {
               {TABS.map((t) => (
                 <button
                   key={t.id}
-                  className={`nav-tab ${tab === t.id ? "active" : ""}`}
-                  onClick={() => setTab(t.id)}
+                  className={`nav-tab ${(t.id === "analytics" ? isAnalyticsActive : tab === t.id) ? "active" : ""}`}
+                  onClick={() => navigateTab(t.id)}
                   style={{ display: "flex", alignItems: "center", gap: "6px" }}
                 >
                   <Icon name={t.icon} size={15} />
@@ -98,7 +110,7 @@ export default function App() {
             <div className="nav-r">
               <div
                 className="avatar"
-                onClick={() => setTab("settings")}
+                onClick={() => navigateTab("settings")}
                 title={`Logged in as ${store.user?.name || "Athlete"}`}
               >
                 {store.user?.name?.[0]?.toUpperCase() || "A"}
@@ -107,13 +119,19 @@ export default function App() {
           </nav>
 
           {/* Main Views */}
-          {tab === "dashboard" && <DashboardPage store={store} setTab={setTab} />}
-          {tab === "workout" && <WorkoutPage store={store} setTab={setTab} />}
-          {tab === "history" && <HistoryPage store={store} setTab={setTab} />}
-          {tab === "analytics" && <AnalyticsPage store={store} />}
+          {tab === "dashboard" && <DashboardPage store={store} setTab={navigateTab} />}
+          {tab === "workout" && <WorkoutPage store={store} setTab={navigateTab} />}
+          {isAnalyticsActive && (
+            <AnalyticsPage
+              store={store}
+              setTab={navigateTab}
+              subTab={tab === "history" ? "history" : analyticsSubTab}
+              setSubTab={setAnalyticsSubTab}
+            />
+          )}
           {tab === "body" && <BodyPage store={store} />}
           {tab === "planner" && <PlannerPage store={store} />}
-          {tab === "goals" && <GoalsPage store={store} setTab={setTab} />}
+          {tab === "goals" && <GoalsPage store={store} setTab={navigateTab} />}
           {tab === "settings" && <SettingsPage store={store} />}
 
           {/* Floating Mobile Bottom Dock */}
@@ -122,8 +140,8 @@ export default function App() {
               {MOBILE_DOCK_TABS.map((t) => (
                 <button
                   key={t.id}
-                  className={`dock-item ${tab === t.id ? "active" : ""}`}
-                  onClick={() => setTab(t.id)}
+                  className={`dock-item ${(t.id === "analytics" ? isAnalyticsActive : tab === t.id) ? "active" : ""}`}
+                  onClick={() => navigateTab(t.id)}
                 >
                   <span className="dock-icon">
                     <Icon name={t.icon} size={18} />

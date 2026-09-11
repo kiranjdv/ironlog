@@ -2607,3 +2607,90 @@ body {
   cursor: not-allowed !important;
   pointer-events: none;
 }
+
+/* ==========================================================================
+   Analytics Unified Sub-Navigation (Segmented Control)
+   ========================================================================== */
+.analytics-subnav-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 24px;
+}
+
+.analytics-subnav {
+  display: inline-flex;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 4px;
+  border-radius: 14px;
+  gap: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+.analytics-subnav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  user-select: none;
+}
+
+.analytics-subnav-btn:hover:not(.active) {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.analytics-subnav-btn.active {
+  background: var(--accent);
+  color: var(--accent-contrast, #000);
+  font-weight: 700;
+  box-shadow: 0 2px 10px var(--accent-glow);
+}
+
+.analytics-subnav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.analytics-subnav-btn.active .analytics-subnav-badge {
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--accent-contrast, #000);
+}
+
+@media (max-width: 600px) {
+  .analytics-subnav-container {
+    width: 100%;
+  }
+  .analytics-subnav {
+    width: 100%;
+    display: flex;
+  }
+  .analytics-subnav-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 8px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+}
+
