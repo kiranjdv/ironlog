@@ -255,10 +255,9 @@ body {
   cursor: pointer;
   outline: none !important;
   -webkit-tap-highlight-color: transparent !important;
-  -webkit-focus-ring-color: transparent !important;
   user-select: none;
   -webkit-user-select: none;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.2px;
@@ -306,10 +305,13 @@ body {
 .page-title {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 38px;
+  line-height: 1.1;
   letter-spacing: 2px;
   margin-bottom: 3px;
+  color: var(--text);
   background: linear-gradient(180deg, var(--text) 0%, var(--text-dim) 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
