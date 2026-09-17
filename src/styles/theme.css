@@ -118,6 +118,10 @@ body {
   user-select: none;
 }
 
+.nav-logo svg {
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+
 .nav-live-badge {
   display: inline-flex;
   align-items: center;

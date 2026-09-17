@@ -1,9 +1,9 @@
-export function Icon({ name, size = 20, className = "" }) {
+export function Icon({ name, size = 20, className = "", fill = "none" }) {
   const props = {
     width: size,
     height: size,
     viewBox: "0 0 24 24",
-    fill: "none",
+    fill: fill,
     stroke: "currentColor",
     strokeWidth: 2,
     strokeLinecap: "round",
@@ -109,8 +109,13 @@ export function Icon({ name, size = 20, className = "" }) {
     case "bolt":
     case "lightning":
       return (
-        <svg {...props}>
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+        <svg
+          {...props}
+          viewBox="0 0 176 356"
+          fill={fill === "none" ? "currentColor" : fill}
+          stroke="none"
+        >
+          <polygon points="176,0 106,140 176,141 4,356 75,204 0,203" />
         </svg>
       );
     case "award":

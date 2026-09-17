@@ -90,7 +90,8 @@ export default function App() {
           <nav className="nav">
             <div className="nav-left">
               <div className="nav-logo" onClick={() => navigateTab("dashboard")} style={{ cursor: "pointer" }}>
-                IRONLOG
+                <Icon name="bolt" size={22} fill="currentColor" />
+                <span>IRONLOG</span>
               </div>
               {store.active && (
                 <div
