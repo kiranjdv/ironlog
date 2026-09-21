@@ -217,7 +217,17 @@ export default function WorkoutPage({ store, setTab }) {
 
       {active.exercises.length === 0 ? (
         <div className="empty-state-card">
-          <div className="empty-icon-wrap">💪</div>
+          <div
+            className="empty-icon-wrap"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--accent)",
+            }}
+          >
+            <Icon name="workout" size={28} />
+          </div>
           <div className="empty-state-title">YOUR WORKOUT IS EMPTY</div>
           <div className="empty-state-text">
             Add exercises to start tracking sets, weights, and reps.
