@@ -1,7 +1,11 @@
+import { useState } from "react";
 import SetRowComp from "./SetRowComp";
 import { uid } from "../utils/helpers";
+import ExerciseGuideModal from "./ExerciseGuideModal";
+import { Icon } from "./Icons";
 
 export default function ExerciseCard({ exercise, muscleColor, onUpdate, onRemove, prs, unit, onSetDone, workouts }) {
+  const [showGuide, setShowGuide] = useState(false);
   const addSet = (type) => onUpdate({ ...exercise, sets: [...exercise.sets, { id: uid(), type, weight: "", reps: "", sets: 1, done: false }] });
   const updSet = (id, data) => onUpdate({ ...exercise, sets: exercise.sets.map(s => s.id === id ? data : s) });
   const remSet = (id) => onUpdate({ ...exercise, sets: exercise.sets.filter(s => s.id !== id) });
@@ -26,8 +30,17 @@ export default function ExerciseCard({ exercise, muscleColor, onUpdate, onRemove
     <div className="ex-card">
       <div className="ex-hdr">
         <div>
-          <div className="flex gap8">
+          <div className="flex gap8" style={{ alignItems: "center", flexWrap: "wrap" }}>
             <div className="ex-name">{exercise.name}</div>
+            <button
+              type="button"
+              className="btn-guide-pill"
+              onClick={() => setShowGuide(true)}
+              title="How to perform this exercise"
+            >
+              <Icon name="info" size={13} />
+              <span>Guide</span>
+            </button>
             {hasPR && <span className="pr-badge">⚡ NEW PR</span>}
           </div>
           <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>{exercise.muscle}</div>
@@ -72,6 +85,13 @@ export default function ExerciseCard({ exercise, muscleColor, onUpdate, onRemove
           <button className="btn btn-danger" style={{ marginLeft: "auto" }} onClick={onRemove}>Remove</button>
         </div>
       </div>
+      {showGuide && (
+        <ExerciseGuideModal
+          exerciseName={exercise.name}
+          muscleGroup={exercise.muscle}
+          onClose={() => setShowGuide(false)}
+        />
+      )}
     </div>
   );
 }

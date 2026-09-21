@@ -4,6 +4,8 @@ import { fmtDate, fmtTime, uid } from "../utils/helpers";
 import ExerciseCard from "../components/ExerciseCard";
 import RestTimer from "../components/RestTimer";
 import CelebrationModal from "../components/CelebrationModal";
+import ExerciseGuideModal from "../components/ExerciseGuideModal";
+import { Icon } from "../components/Icons";
 
 export default function WorkoutPage({ store, setTab }) {
   const {
@@ -25,6 +27,7 @@ export default function WorkoutPage({ store, setTab }) {
   const [customName, setCustomName] = useState("");
   const [customMuscle, setCustomMuscle] = useState("Chest");
   const [lastFinishedWorkout, setLastFinishedWorkout] = useState(null);
+  const [guideEx, setGuideEx] = useState(null);
   const { unit } = store.settings;
 
   useEffect(() => {
@@ -316,32 +319,50 @@ export default function WorkoutPage({ store, setTab }) {
                   </button>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {allExercises(selMuscle).map((ex) => (
-                      <button
+                      <div
                         key={ex}
+                        className="picker-ex-row"
                         style={{
-                          padding: "12px 16px",
+                          padding: "10px 14px",
                           background: "var(--surface)",
                           border: "1px solid var(--border)",
                           borderRadius: 10,
-                          color: "var(--text)",
-                          fontFamily: "'DM Sans',sans-serif",
-                          fontSize: 14,
-                          fontWeight: 500,
-                          cursor: "pointer",
-                          textAlign: "left",
                           display: "flex",
                           justifyContent: "space-between",
                           alignItems: "center",
-                          transition: "all 0.2s ease",
-                        }}
-                        onClick={() => {
-                          addExercise(ex, selMuscle);
-                          setSelMuscle(null);
+                          gap: 10,
                         }}
                       >
-                        <span>{ex}</span>
-                        <span style={{ color: "var(--accent)", fontSize: 18, fontWeight: 700 }}>+</span>
-                      </button>
+                        <span style={{ fontSize: 14, fontWeight: 500, color: "var(--text)", flex: 1 }}>
+                          {ex}
+                        </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <button
+                            type="button"
+                            className="btn-guide-pill"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setGuideEx({ name: ex, muscle: selMuscle });
+                            }}
+                            title="How to perform this exercise"
+                          >
+                            <Icon name="info" size={13} />
+                            <span>Guide</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-acc btn-sm"
+                            style={{ padding: "6px 12px", fontSize: 13 }}
+                            onClick={() => {
+                              addExercise(ex, selMuscle);
+                              setSelMuscle(null);
+                            }}
+                            title="Add to workout"
+                          >
+                            + Add
+                          </button>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </>
@@ -443,6 +464,19 @@ export default function WorkoutPage({ store, setTab }) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Exercise Guide Modal */}
+      {guideEx && (
+        <ExerciseGuideModal
+          exerciseName={guideEx.name}
+          muscleGroup={guideEx.muscle}
+          onClose={() => setGuideEx(null)}
+          onAddExercise={(name, muscle) => {
+            addExercise(name, muscle);
+            setGuideEx(null);
+          }}
+        />
       )}
     </div>
   );
