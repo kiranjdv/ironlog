@@ -1217,6 +1217,36 @@ export const EXERCISE_GUIDES = {
     videoQuery: "bulgarian+split+squat+form+guide"
   },
 
+  "Sumo Squat": {
+    difficulty: "Beginner",
+    equipment: "Barbell / Dumbbell",
+    muscle: "Legs",
+    primaryMuscles: ["Hip Adductors (Inner Thighs)", "Gluteus Maximus", "Quadriceps"],
+    secondaryMuscles: ["Hamstrings", "Core", "Calves"],
+    starterVolume: "3 sets × 10–12 reps",
+    setup: [
+      "Take a wide stance roughly 1.5 to 2 times your shoulder-width.",
+      "Turn your toes outward at roughly 45 degrees.",
+      "Hold a dumbbell vertically by one end between your legs, or place a barbell across your upper traps.",
+      "Keep your torso upright with shoulder blades retracted and abs braced."
+    ],
+    execution: [
+      "Inhale, push your knees outward in line with your toes, and lower your hips down.",
+      "Descend until your thighs are parallel to the floor, feeling the intense inner-thigh stretch.",
+      "Drive through your heels and mid-foot to stand, squeezing your glutes hard at the top."
+    ],
+    proTips: [
+      "Keep your torso more upright than in a conventional squat.",
+      "Never allow your knees to cave inward—push them out over your toes throughout the entire rep."
+    ],
+    commonMistakes: [
+      "Knees caving inward (valgus collapse), which strains the MCL.",
+      "Bending forward at the hips instead of sitting down between your thighs."
+    ],
+    alternative: "Goblet Squat or Adductor Machine",
+    videoQuery: "how+to+sumo+squat+proper+form"
+  },
+
   "Hip Thrust": {
     difficulty: "Beginner",
     equipment: "Barbell",
@@ -2263,6 +2293,7 @@ const KEYWORD_PATTERNS = [
   { regex: /\bleg\s*curl/i, target: "Leg Curl" },
   { regex: /\bleg\s*ext/i, target: "Leg Extension" },
   { regex: /\blunge/i, target: "Lunges" },
+  { regex: /\bsum[oa]\b/i, target: "Sumo Squat" },
   { regex: /\bsquat/i, target: "Squat" },
 
   // Chest
@@ -2336,9 +2367,126 @@ const KEYWORD_PATTERNS = [
   { regex: /\bhanging\s*knee/i, target: "Hanging Knee Raises" },
 ];
 
+// Levenshtein distance calculation (100% offline pure JS)
+export function levenshteinDistance(s1 = "", s2 = "") {
+  const a = s1.toLowerCase();
+  const b = s2.toLowerCase();
+  const m = a.length;
+  const n = b.length;
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,      // deletion
+        dp[i][j - 1] + 1,      // insertion
+        dp[i - 1][j - 1] + cost // substitution
+      );
+    }
+  }
+  return dp[m][n];
+}
+
+// Calculate similarity ratio between 0.0 and 1.0
+export function calculateSimilarity(s1 = "", s2 = "") {
+  const maxLen = Math.max(s1.length, s2.length);
+  if (maxLen === 0) return 1.0;
+  const dist = levenshteinDistance(s1, s2);
+  return (maxLen - dist) / maxLen;
+}
+
+/**
+ * Find closest matching exercise with typo tolerance
+ * Returns matching exercise data if similarity is >= 0.70
+ */
+export function findClosestExercise(inputName) {
+  if (!inputName || typeof inputName !== "string") return null;
+  const trimmed = inputName.trim();
+  if (trimmed.length < 3) return null;
+
+  const lowerInput = trimmed.toLowerCase();
+  const allExercises = Object.entries(EXERCISE_GUIDES).map(([name, guide]) => ({
+    name,
+    muscle: guide.muscle,
+    guide
+  }));
+
+  // 1. Direct exact or case-insensitive match
+  const exact = allExercises.find(e => e.name.toLowerCase() === lowerInput);
+  if (exact) {
+    return { name: exact.name, muscle: exact.muscle, similarity: 1.0, isTypo: false, guide: exact.guide };
+  }
+
+  // 2. Check keyword patterns
+  for (const item of KEYWORD_PATTERNS) {
+    if (item.regex.test(lowerInput)) {
+      const matched = EXERCISE_GUIDES[item.target];
+      if (matched) {
+        return {
+          name: item.target,
+          muscle: matched.muscle,
+          similarity: 0.95,
+          isTypo: item.target.toLowerCase() !== lowerInput,
+          guide: matched
+        };
+      }
+    }
+  }
+
+  // 3. Levenshtein Typo Tolerance Search
+  let bestMatch = null;
+  let highestScore = 0;
+
+  for (const ex of allExercises) {
+    const lowerEx = ex.name.toLowerCase();
+    
+    // Direct whole-string similarity
+    const wholeSim = calculateSimilarity(lowerInput, lowerEx);
+    
+    // Word-token similarity (e.g. "suma" in "suma squat" vs "sumo" in "sumo squat")
+    const inputWords = lowerInput.split(/\s+/);
+    const exWords = lowerEx.split(/\s+/);
+    
+    let totalWordSim = 0;
+    for (const iw of inputWords) {
+      let maxWordSim = 0;
+      for (const ew of exWords) {
+        const sim = calculateSimilarity(iw, ew);
+        if (sim > maxWordSim) maxWordSim = sim;
+      }
+      totalWordSim += maxWordSim;
+    }
+    const avgWordSim = totalWordSim / inputWords.length;
+
+    const combinedScore = Math.max(wholeSim, avgWordSim);
+
+    if (combinedScore > highestScore) {
+      highestScore = combinedScore;
+      bestMatch = ex;
+    }
+  }
+
+  // If score is at least 70% similar, consider it a typo match
+  if (highestScore >= 0.70 && bestMatch) {
+    return {
+      name: bestMatch.name,
+      muscle: bestMatch.muscle,
+      similarity: highestScore,
+      isTypo: true,
+      guide: bestMatch.guide
+    };
+  }
+
+  return null;
+}
+
 /**
  * Intelligent 100% Offline Guide Matcher
- * Finds exact matches, case-insensitive matches, or matches via Smart Keyword Patterns.
+ * Finds exact matches, case-insensitive matches, keyword pattern matches, or typo-corrected matches.
  */
 export function getExerciseGuide(exerciseName = "", muscleGroup = "Full Body") {
   const trimmed = exerciseName.trim();
@@ -2372,7 +2520,19 @@ export function getExerciseGuide(exerciseName = "", muscleGroup = "Full Body") {
     }
   }
 
-  // 4. Smart fallback based on muscle group
+  // 4. Offline Typo-Tolerance Auto-Correction (e.g. "suma squat" -> "Sumo Squat", "spidar curl" -> "Spider Curl")
+  const typoMatch = findClosestExercise(trimmed);
+  if (typoMatch && typoMatch.guide) {
+    return {
+      name: trimmed,
+      matchedFrom: typoMatch.name,
+      isTypoCorrection: true,
+      ...typoMatch.guide,
+      videoQuery: `${typoMatch.name.replace(/\s+/g, "+")}+exercise+proper+form`
+    };
+  }
+
+  // 5. Smart fallback based on muscle group
   const defaultGuides = {
     Chest: {
       difficulty: "Beginner",

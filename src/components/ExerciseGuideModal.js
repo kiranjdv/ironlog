@@ -77,7 +77,7 @@ export default function ExerciseGuideModal({
               <h2 className="guide-ex-name">{guide.name}</h2>
               {guide.matchedFrom && guide.matchedFrom.toLowerCase() !== guide.name.toLowerCase() && (
                 <div style={{ fontSize: 11, color: "var(--accent)", marginTop: 4, display: "flex", alignItems: "center", gap: 5 }}>
-                  <span>⚡ Matched technique:</span>
+                  <span>{guide.isTypoCorrection ? "⚡ Auto-corrected typo ➔" : "⚡ Matched technique:"}</span>
                   <span style={{ fontWeight: 700, textDecoration: "underline" }}>{guide.matchedFrom}</span>
                 </div>
               )}

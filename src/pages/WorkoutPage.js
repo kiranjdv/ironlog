@@ -6,6 +6,7 @@ import RestTimer from "../components/RestTimer";
 import CelebrationModal from "../components/CelebrationModal";
 import ExerciseGuideModal from "../components/ExerciseGuideModal";
 import { Icon } from "../components/Icons";
+import { findClosestExercise } from "../constants/exerciseGuideData";
 
 export default function WorkoutPage({ store, setTab }) {
   const {
@@ -391,6 +392,43 @@ export default function WorkoutPage({ store, setTab }) {
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
                 />
+                {(() => {
+                  const suggestion = customName.trim().length >= 2 ? findClosestExercise(customName) : null;
+                  if (!suggestion || suggestion.name.toLowerCase() === customName.trim().toLowerCase()) return null;
+                  return (
+                    <div
+                      style={{
+                        marginTop: 6,
+                        padding: "8px 12px",
+                        background: "var(--accent-subtle)",
+                        border: "1px solid var(--accent-border)",
+                        borderRadius: 8,
+                        fontSize: 12,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                      }}
+                      onClick={() => {
+                        setCustomName(suggestion.name);
+                        if (suggestion.muscle) {
+                          setCustomMuscle(suggestion.muscle);
+                        }
+                      }}
+                      title="Click to auto-correct spelling"
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span>💡 Did you mean:</span>
+                        <strong style={{ color: "var(--accent)" }}>{suggestion.name}</strong>
+                        {suggestion.muscle && (
+                          <span style={{ color: "var(--muted)", fontSize: 11 }}>({suggestion.muscle})</span>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: "var(--accent)" }}>Use ↵</span>
+                    </div>
+                  );
+                })()}
               </div>
               <div className="mb16">
                 <div className="il">Target Muscle</div>
