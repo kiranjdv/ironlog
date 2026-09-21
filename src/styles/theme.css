@@ -1859,27 +1859,28 @@ body {
 }
 
 .hist-delete-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: rgba(255, 77, 109, 0.12);
+  border: 1px solid rgba(255, 77, 109, 0.32);
+  border-radius: 9px;
   width: 36px;
   height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--text-dim);
-  opacity: 0.85;
+  color: #FF4D6D;
+  opacity: 1;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(255, 77, 109, 0.15);
 }
 
 .hist-delete-btn:hover {
-  opacity: 1;
-  color: var(--accent2);
-  background: rgba(255, 77, 109, 0.15);
-  border-color: rgba(255, 77, 109, 0.4);
-  transform: scale(1.05);
+  background: #FF4D6D;
+  color: #FFFFFF;
+  border-color: #FF4D6D;
+  box-shadow: 0 4px 14px rgba(255, 77, 109, 0.4);
+  transform: scale(1.06);
 }
 
 .hist-delete-confirm {
