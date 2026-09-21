@@ -241,54 +241,25 @@ export default function HistoryPage({ store, setTab, embedded = false }) {
                   }
                 }}
               >
-                <div className="hist-header-left">
-                  <div className="hist-date-icon" style={{ color: "var(--accent)" }}>
-                    <Icon name="calendar" size={22} />
-                  </div>
-                  <div>
-                    <div className="hist-date">{fmtDate(w.date)}</div>
-                    <div className="hist-time-tag">
-                      <span className="hist-time-icon" style={{ display: "inline-flex", alignItems: "center" }}>
-                        <Icon name="time" size={13} />
-                      </span>
-                      <span>
-                        Time taken:{" "}
-                        <strong style={{ color: "var(--accent)" }}>
-                          {w.duration ? fmtDuration(w.duration) : "Not recorded"}
-                        </strong>
-                      </span>
+                <div className="hist-header-top-row">
+                  <div className="hist-header-left">
+                    <div className="hist-date-icon" style={{ color: "var(--accent)" }}>
+                      <Icon name="calendar" size={22} />
                     </div>
-                  </div>
-                </div>
-
-                <div className="hist-header-right">
-                  {/* Quick Summary Pill on Header */}
-                  <div className="hist-quick-stats">
-                    <span className="hist-quick-stat">
-                      <strong>{(w.exercises || []).length}</strong> ex
-                    </span>
-                    <span className="hist-quick-dot">•</span>
-                    <span className="hist-quick-stat">
-                      <strong>{totalDoneSets}</strong> sets
-                    </span>
-                    {totalVolume > 0 && (
-                      <>
-                        <span className="hist-quick-dot">•</span>
-                        <span className="hist-quick-stat text-accent">
-                          <strong>{Math.round(totalVolume).toLocaleString()}</strong> {unit}
+                    <div>
+                      <div className="hist-date">{fmtDate(w.date)}</div>
+                      <div className="hist-time-tag">
+                        <span className="hist-time-icon" style={{ display: "inline-flex", alignItems: "center" }}>
+                          <Icon name="time" size={13} />
                         </span>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Expand Chevron & Action Button */}
-                  <div className="hist-expand-trigger">
-                    <span className="hist-expand-label">
-                      {isExpanded ? "Hide Info" : "View Info"}
-                    </span>
-                    <span className={`hist-chevron ${isExpanded ? "open" : ""}`}>
-                      ▼
-                    </span>
+                        <span>
+                          Time taken:{" "}
+                          <strong style={{ color: "var(--accent)" }}>
+                            {w.duration ? fmtDuration(w.duration) : "Not recorded"}
+                          </strong>
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Delete button (stopPropagation so it won't toggle accordion) */}
@@ -320,11 +291,42 @@ export default function HistoryPage({ store, setTab, embedded = false }) {
                         className="hist-delete-btn"
                         onClick={() => setDeleteConfirmId(w.id)}
                         title="Delete workout"
-                        style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                        aria-label="Delete workout"
                       >
-                        <Icon name="trash" size={15} />
+                        <Icon name="trash" size={16} />
                       </button>
                     )}
+                  </div>
+                </div>
+
+                <div className="hist-header-right">
+                  {/* Quick Summary Pill on Header */}
+                  <div className="hist-quick-stats">
+                    <span className="hist-quick-stat">
+                      <strong>{(w.exercises || []).length}</strong> ex
+                    </span>
+                    <span className="hist-quick-dot">•</span>
+                    <span className="hist-quick-stat">
+                      <strong>{totalDoneSets}</strong> sets
+                    </span>
+                    {totalVolume > 0 && (
+                      <>
+                        <span className="hist-quick-dot">•</span>
+                        <span className="hist-quick-stat text-accent">
+                          <strong>{Math.round(totalVolume).toLocaleString()}</strong> {unit}
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Expand Chevron & Action Button */}
+                  <div className="hist-expand-trigger">
+                    <span className="hist-expand-label">
+                      {isExpanded ? "Hide Info" : "View Info"}
+                    </span>
+                    <span className={`hist-chevron ${isExpanded ? "open" : ""}`}>
+                      ▼
+                    </span>
                   </div>
                 </div>
               </div>
@@ -503,6 +505,39 @@ export default function HistoryPage({ store, setTab, embedded = false }) {
                         );
                       })}
                     </div>
+                  </div>
+
+                  {/* Delete Workout Session in Expanded Details */}
+                  <div className="hist-expanded-footer" onClick={(e) => e.stopPropagation()}>
+                    {deleteConfirmId === w.id ? (
+                      <div className="hist-delete-confirm">
+                        <span className="hist-delete-prompt">Permanently delete this workout?</span>
+                        <button
+                          className="btn-danger-sm"
+                          onClick={() => {
+                            if (store.deleteWorkout) store.deleteWorkout(w.id);
+                            setDeleteConfirmId(null);
+                          }}
+                        >
+                          Yes, Delete
+                        </button>
+                        <button
+                          className="btn-ghost-sm"
+                          onClick={() => setDeleteConfirmId(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        className="hist-expanded-delete-btn"
+                        onClick={() => setDeleteConfirmId(w.id)}
+                        title="Delete workout"
+                      >
+                        <Icon name="trash" size={14} />
+                        <span>Delete Workout</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
