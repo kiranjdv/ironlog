@@ -27,16 +27,20 @@ IRONLOG runs entirely in your browser. There is no backend server, no remote dat
 | Category | Details |
 |---|---|
 | 🏋️ **Active Workout Logging** | Track warm-up, working, superset, and dropset entries per exercise, with an interactive floating rest timer and live workout duration tracker |
+| 📖 **80+ Exercise Form Guides** | Instant offline guides with setup, execution, pro mind-muscle cues, common mistake warnings, starter volume targets, and one-click video tutorials |
+| 🔤 **Offline Typo-Tolerance** | Built-in Levenshtein distance algorithm auto-suggests corrections and "Did you mean?" prompts for custom exercises in real time |
+| 🗂️ **Unified Subtab Navigation** | Streamlined 5-tab interface with segmented inner subtabs: **Analytics** (*Insights* vs. *History*) and **Settings** (*Profile* vs. *Body Tracking*) |
 | 🎯 **Advanced Goals & Targets** | Multi-type goal tracking: **Strength PRs**, **Bodyweight & Physique**, and **Consistency Habits** with real-time PR sync |
 | ⏳ **Deadlines & Countdowns** | Set target dates on goals with smart countdown badges (*"14 days left"*, *"Due Today"*, *"Overdue by 3d"*) |
 | 🏆 **Trophy Cabinet & Badges** | Live progress indicators on locked achievements (*e.g., "7/10 workouts • 70%"*, *"SBD 210/250 kg • 84%"*), celebration modals, and trophy filters |
 | 📊 **Deep Analytics & 1RM** | Estimated 1RM calculations, volume/tonnage progression over time, muscle balance breakdown, and GitHub-style activity heatmap |
-| ⚡ **100% Crisp SVG System** | Pure scalable vector graphics throughout the entire interface via modular `<Icon />` components |
+| ⚡ **100% Crisp SVG System** | Pure scalable vector graphics throughout the entire interface (including custom thunderbolt logo) via modular `<Icon />` components |
 | 📏 **Body Composition** | Log body weight, body fat %, and physique measurements with trend charts |
 | 📅 **Planner & Templates** | Weekly calendar schedule with built-in PPL, 5x5, and full-body templates + custom routine builder |
 | 🌓 **Dual Athletic Themes** | **Cyberpunk Dark Mode** (Matte Obsidian + Neon Volt) & **Kinetic Light Mode** (Porcelain Slate + Kinetic Cyber-Green) with dynamic button contrast |
+| 🗑️ **Safe Workout Management** | Vibrant crimson delete buttons with hover glow and two-step confirmation safeguards, accessible on mobile headers and expanded footers |
 | 💾 **Backup & Privacy** | One-click JSON backup/restore, CSV export, and browser persistent storage request |
-| 📱 **PWA / Offline First** | 100% functional offline with service worker caching, installable on mobile and desktop |
+| 📱 **PWA / Offline First (v3)** | 100% functional offline with Service Worker v3 caching, installable on mobile and desktop |
 
 ---
 
@@ -62,6 +66,7 @@ IRONLOG features a high-performance, athletic aesthetic built for lifters:
 - **Dynamic Text Contrast (`--accent-contrast`)**: Automatically adapts button typography between bold obsidian black on dark neon and crisp white on vivid green.
 - **Pure SVG Vector Icons**: All icons render through crisp, scalable vectors—no blurry emojis or font-icon artifacts.
 - **Interactive Celebrations**: Celebratory modals and visual bursts trigger whenever you achieve a personal record or smash a fitness target.
+- **Segmented Subtabs**: Clean, glassmorphic pill switchers allow instant toggling between deep analytics and raw history logs, or preferences and body measurements.
 
 ---
 
@@ -71,8 +76,9 @@ IRONLOG features a high-performance, athletic aesthetic built for lifters:
 - **Vanilla CSS3** — CSS custom properties, responsive Flexbox & CSS Grid, fluid micro-animations
 - **IndexedDB** — client-side structured database persistence (with automatic legacy localStorage migration)
 - **Web Crypto API** — client-side salted SHA-256 password hashing (`crypto.subtle.digest`)
-- **Service Worker (PWA)** — offline asset caching and home-screen installability
+- **Service Worker v3 (PWA)** — offline asset caching, cache busting, and home-screen installability
 - **Storage Manager API** (`navigator.storage.persist()`) — requests browser protection from automatic data eviction
+- **Levenshtein Distance Engine** — pure client-side dynamic programming for real-time typo-tolerant exercise matching
 
 ---
 
@@ -81,7 +87,7 @@ IRONLOG features a high-performance, athletic aesthetic built for lifters:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                           App.js                            │
-│           (tab routing, dynamic theme attribute)            │
+│    (unified 5-tab dock/nav, segmented subtab routing)       │
 └──────────────────────────────┬──────────────────────────────┘
                                │
                ┌───────────────┴───────────────┐
@@ -152,15 +158,17 @@ npm test -- --watchAll=false
 
 ```
 src/
-├── components/          # Reusable UI pieces (ExerciseCard, Icons, RestTimer, LineChart, etc.)
+├── components/          # Reusable UI pieces
 │   ├── CelebrationModal.js
-│   ├── ExerciseCard.js
+│   ├── ExerciseCard.js  # Card logger with quick guide launcher & last session stats
+│   ├── ExerciseGuideModal.js # 80+ exercise form modal with setup & cues
 │   ├── Icons.js         # Scalable SVG icon library
 │   ├── LineChart.js
 │   ├── RestTimer.js
 │   └── SetRowComp.js
-├── constants/           # Static constants: muscle groups, templates, achievements
-│   └── workoutData.js
+├── constants/           # Static constants & offline knowledge bases
+│   ├── exerciseGuideData.js # 80+ form guides, Levenshtein typo-matching & patterns
+│   └── workoutData.js   # Muscle groups, templates, achievements
 ├── hooks/               # Modular state hooks
 │   ├── useAuth.js
 │   ├── useBodyLog.js
@@ -171,27 +179,27 @@ src/
 │   ├── useStore.js
 │   └── useWorkouts.js
 ├── pages/               # Tab pages
-│   ├── AnalyticsPage.js
-│   ├── BodyPage.js
+│   ├── AnalyticsPage.js # Performance Insights + embedded History subtab
+│   ├── BodyPage.js      # Physique & metric tracking (standalone or embedded)
 │   ├── DashboardPage.js
 │   ├── GoalsPage.js     # Multi-type goals, countdowns & trophy cabinet
-│   ├── HistoryPage.js
+│   ├── HistoryPage.js   # Detailed workout logs with crimson delete action
 │   ├── LoginPage.js
 │   ├── PlannerPage.js
-│   ├── SettingsPage.js
-│   └── WorkoutPage.js
+│   ├── SettingsPage.js  # Preferences & Profile + embedded Body Tracking subtab
+│   └── WorkoutPage.js   # Active workout logger with typo-tolerant quick add
 ├── styles/
-│   └── theme.css        # CSS variables, dark/light themes, animations
+│   └── theme.css        # CSS variables, dark/light themes, animations, crimson buttons
 ├── utils/
 │   ├── crypto.js        # Web Crypto SHA-256 hashing & salting
 │   ├── db.js            # IndexedDB abstraction layer
 │   └── helpers.js       # Date formatting, streaks, 1RM formulas
-├── App.js               # Main layout & navigation
+├── App.js               # Main layout, 5-tab mobile dock & subtab router
 └── index.js             # React entry point + PWA registration
 
 public/
 ├── manifest.json        # PWA manifest
-└── service-worker.js    # Offline caching script
+└── service-worker.js    # Offline caching script (v3)
 ```
 
 ---
@@ -224,6 +232,11 @@ Account credentials are protected client-side using the **Web Crypto API** (`cry
 - [x] Multi-type goal tracking (Strength, Physique, Habits) with target deadlines
 - [x] Live progress indicators on locked achievements
 - [x] High-contrast Kinetic Light Theme
+- [x] 80+ Exercise Form Guide Library with setup, execution & common mistake warnings
+- [x] 100% Offline Levenshtein typo-tolerance & live search auto-correction
+- [x] Streamlined 5-tab mobile dock with segmented internal subtabs
+- [x] Service Worker v3 offline caching upgrade
+- [x] Mobile-optimized workout deletion with two-step confirmation & glowing crimson styling
 - [ ] End-to-end encrypted sync via user-owned cloud storage (Google Drive / WebDAV)
 - [ ] Automated GitHub Actions CI test suite
 
