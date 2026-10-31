@@ -80,6 +80,7 @@ export default function useStore() {
     deleteGoal: goalsHook.deleteGoal,
     customExercises: myCustomEx,
     addCustomExercise: customExHook.addCustomExercise,
+    deleteCustomExercise: customExHook.deleteCustomExercise,
     schedule: mySchedule,
     scheduleWorkout: plannerHook.scheduleWorkout,
     settings: settingsHook.settings,

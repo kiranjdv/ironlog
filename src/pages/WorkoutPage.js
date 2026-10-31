@@ -329,52 +329,94 @@ export default function WorkoutPage({ store, setTab }) {
                     ← Back to Muscle Groups
                   </button>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    {allExercises(selMuscle).map((ex) => (
-                      <div
-                        key={ex}
-                        className="picker-ex-row"
-                        style={{
-                          padding: "10px 14px",
-                          background: "var(--surface)",
-                          border: "1px solid var(--border)",
-                          borderRadius: 10,
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          gap: 10,
-                        }}
-                      >
-                        <span style={{ fontSize: 14, fontWeight: 500, color: "var(--text)", flex: 1 }}>
-                          {ex}
-                        </span>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <button
-                            type="button"
-                            className="btn-guide-pill"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setGuideEx({ name: ex, muscle: selMuscle });
-                            }}
-                            title="How to perform this exercise"
-                          >
-                            <Icon name="info" size={13} />
-                            <span>Guide</span>
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-acc btn-sm"
-                            style={{ padding: "6px 12px", fontSize: 13 }}
-                            onClick={() => {
-                              addExercise(ex, selMuscle);
-                              setSelMuscle(null);
-                            }}
-                            title="Add to workout"
-                          >
-                            + Add
-                          </button>
+                    {allExercises(selMuscle).map((ex) => {
+                      const isCustom = (store.customExercises[selMuscle] || []).includes(ex);
+                      return (
+                        <div
+                          key={ex}
+                          className="picker-ex-row"
+                          style={{
+                            padding: "10px 14px",
+                            background: "var(--surface)",
+                            border: "1px solid var(--border)",
+                            borderRadius: 10,
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            gap: 10,
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
+                            <span style={{ fontSize: 14, fontWeight: 500, color: "var(--text)" }}>
+                              {ex}
+                            </span>
+                            {isCustom && (
+                              <span
+                                style={{
+                                  fontSize: 10,
+                                  padding: "2px 6px",
+                                  borderRadius: 4,
+                                  background: "var(--surface2)",
+                                  color: "var(--muted)",
+                                  fontWeight: 600,
+                                  textTransform: "uppercase",
+                                  letterSpacing: "0.5px",
+                                }}
+                              >
+                                Custom
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <button
+                              type="button"
+                              className="btn-guide-pill"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setGuideEx({ name: ex, muscle: selMuscle });
+                              }}
+                              title="How to perform this exercise"
+                            >
+                              <Icon name="info" size={13} />
+                              <span>Guide</span>
+                            </button>
+                            {isCustom && (
+                              <button
+                                type="button"
+                                className="btn-ghost"
+                                style={{
+                                  padding: "6px",
+                                  color: "var(--danger, #EF4444)",
+                                  borderRadius: 6,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  store.deleteCustomExercise(selMuscle, ex);
+                                }}
+                                title="Delete custom exercise"
+                              >
+                                <Icon name="trash" size={15} />
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              className="btn btn-acc btn-sm"
+                              style={{ padding: "6px 12px", fontSize: 13 }}
+                              onClick={() => {
+                                addExercise(ex, selMuscle);
+                                setSelMuscle(null);
+                              }}
+                              title="Add to workout"
+                            >
+                              + Add
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </>
               )}

@@ -29,5 +29,18 @@ export function useCustomExercises(db, currentUser) {
     if (db) await dbPut(db, "kv", newCustomEx, "customExercises");
   };
 
-  return { customExercises, loading, addCustomExercise };
+  const deleteCustomExercise = async (muscle, name) => {
+    const userEx = { ...(customExercises[currentUser] || {}) };
+    if (userEx[muscle]) {
+      userEx[muscle] = userEx[muscle].filter((ex) => ex !== name);
+      if (userEx[muscle].length === 0) {
+        delete userEx[muscle];
+      }
+      const newCustomEx = { ...customExercises, [currentUser]: userEx };
+      setCustomExercises(newCustomEx);
+      if (db) await dbPut(db, "kv", newCustomEx, "customExercises");
+    }
+  };
+
+  return { customExercises, loading, addCustomExercise, deleteCustomExercise };
 }
