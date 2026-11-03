@@ -287,6 +287,44 @@ export function Icon({ name, size = 20, className = "", fill = "none" }) {
           <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
       );
+    case "cloud":
+      return (
+        <svg {...props}>
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+        </svg>
+      );
+    case "cloud-upload":
+      return (
+        <svg {...props}>
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+          <polyline points="16 16 12 12 8 16" />
+          <line x1="12" y1="12" x2="12" y2="21" />
+        </svg>
+      );
+    case "cloud-download":
+      return (
+        <svg {...props}>
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+          <polyline points="8 17 12 21 16 17" />
+          <line x1="12" y1="12" x2="12" y2="21" />
+        </svg>
+      );
+    case "lock":
+      return (
+        <svg {...props}>
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+      );
+    case "sync":
+    case "refresh":
+      return (
+        <svg {...props}>
+          <polyline points="23 4 23 10 17 10" />
+          <polyline points="1 20 1 14 7 14" />
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+        </svg>
+      );
     default:
       return null;
   }

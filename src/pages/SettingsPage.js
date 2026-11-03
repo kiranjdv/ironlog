@@ -3,6 +3,7 @@ import { fmtDate } from "../utils/helpers";
 import { dbGet, dbGetAll, dbPut, dbClear } from "../utils/db";
 import BodyPage from "./BodyPage";
 import { Icon } from "../components/Icons";
+import CloudSyncCard from "../components/CloudSyncCard";
 
 export default function SettingsPage({ store, subTab, setSubTab }) {
   const { settings, saveSettings } = store;
@@ -343,6 +344,10 @@ export default function SettingsPage({ store, subTab, setSubTab }) {
               ))}
             </div>
           </div>
+
+          {/* User-Owned Zero-Backend Cloud Sync */}
+          <CloudSyncCard store={store} />
+
           {Object.keys(store.prs).length > 0 && (
             <div className="panel">
               <div style={{ padding: 18 }}>

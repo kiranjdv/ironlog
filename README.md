@@ -40,6 +40,7 @@ IRONLOG runs entirely in your browser. There is no backend server, no remote dat
 | 🌓 **Dual Athletic Themes** | **Cyberpunk Dark Mode** (Matte Obsidian + Neon Volt) & **Kinetic Light Mode** (Porcelain Slate + Kinetic Cyber-Green) with dynamic button contrast |
 | 🗑️ **Safe Workout Management** | Vibrant crimson delete buttons with hover glow and two-step confirmation safeguards, accessible on mobile headers and expanded footers |
 | 💾 **Backup & Privacy** | One-click JSON backup/restore, CSV export, and browser persistent storage request |
+| ☁️ **User-Owned Cloud Sync** | Zero-backend multi-device sync via **Google Drive (AppData)** or **WebDAV** with optional client-side **AES-GCM-256** Zero-Knowledge encryption |
 | 📱 **PWA / Offline First (v3)** | 100% functional offline with Service Worker v3 caching, installable on mobile and desktop |
 
 ---
@@ -237,7 +238,7 @@ Account credentials are protected client-side using the **Web Crypto API** (`cry
 - [x] Streamlined 5-tab mobile dock with segmented internal subtabs
 - [x] Service Worker v3 offline caching upgrade
 - [x] Mobile-optimized workout deletion with two-step confirmation & glowing crimson styling
-- [ ] End-to-end encrypted sync via user-owned cloud storage (Google Drive / WebDAV)
+- [x] End-to-end encrypted sync via user-owned cloud storage (Google Drive / WebDAV)
 - [ ] Automated GitHub Actions CI test suite
 
 ---
