@@ -233,7 +233,7 @@ export default function SettingsPage({ store, subTab, setSubTab }) {
 
 
 
-  const settingsRows = [
+  const preferenceRows = [
     { 
       l: "Weight Unit", 
       s: "Used everywhere", 
@@ -254,12 +254,14 @@ export default function SettingsPage({ store, subTab, setSubTab }) {
         </div>
       )
     },
-
     { 
       l: "Storage Persistence", 
       s: persistent ? "✓ Secured (Browser won't auto-clear)" : "Standard (Request persistence protection)", 
       el: <button className={`btn ${persistent ? "btn-out" : "btn-purple"}`} onClick={requestPersistence} disabled={persistent}>{persistent ? "Secured" : "Request"}</button> 
     },
+  ];
+
+  const backupRows = [
     { 
       l: "Backup JSON", 
       s: "Save all your logs to a JSON file", 
@@ -274,11 +276,6 @@ export default function SettingsPage({ store, subTab, setSubTab }) {
       l: "Export CSV", 
       s: "Download workouts for Excel/Spreadsheets", 
       el: <button className="btn btn-out" onClick={exportCSV}>{exportDone ? "✓ Done!" : "Export CSV"}</button> 
-    },
-    { 
-      l: "Sign Out", 
-      s: "Log out from connection and device session", 
-      el: <button className="btn btn-danger" onClick={store.logout}>Logout</button> 
     },
   ];
 
@@ -322,9 +319,10 @@ export default function SettingsPage({ store, subTab, setSubTab }) {
         <BodyPage store={store} embedded={true} />
       ) : (
         <>
+          {/* 1. Profile & Preferences */}
           <div className="panel mb20">
             <div style={{ padding: 18 }}>
-              <div className="sec-lbl">PROFILE & SETTINGS</div>
+              <div className="sec-lbl">PROFILE & PREFERENCES</div>
               <div className="flex gap12 mb16">
                 <div className="avatar" style={{ width: 52, height: 52, fontSize: 20 }}>{store.user?.name?.[0]?.toUpperCase() || "A"}</div>
                 <div>
@@ -333,8 +331,8 @@ export default function SettingsPage({ store, subTab, setSubTab }) {
                   <div style={{ color: "var(--muted)", fontSize: 11, marginTop: 2 }}>{store.workouts.length} workouts logged</div>
                 </div>
               </div>
-              {settingsRows.map((r, i) => (
-                <div key={r.l} className="setting-row" style={i === settingsRows.length - 1 ? { borderBottom: "none" } : {}}>
+              {preferenceRows.map((r, i) => (
+                <div key={r.l} className="setting-row" style={i === preferenceRows.length - 1 ? { borderBottom: "none" } : {}}>
                   <div>
                     <div className="setting-lbl">{r.l}</div>
                     <div className="setting-sub">{r.s}</div>
@@ -345,8 +343,38 @@ export default function SettingsPage({ store, subTab, setSubTab }) {
             </div>
           </div>
 
-          {/* User-Owned Zero-Backend Cloud Sync */}
+          {/* 2. User-Owned Zero-Backend Cloud Sync */}
           <CloudSyncCard store={store} />
+
+          {/* 3. Manual Offline Backups & Data Export */}
+          <div className="panel mb20">
+            <div style={{ padding: 18 }}>
+              <div className="sec-lbl">OFFLINE BACKUP & EXPORT</div>
+              {backupRows.map((r, i) => (
+                <div key={r.l} className="setting-row" style={i === backupRows.length - 1 ? { borderBottom: "none" } : {}}>
+                  <div>
+                    <div className="setting-lbl">{r.l}</div>
+                    <div className="setting-sub">{r.s}</div>
+                  </div>
+                  {r.el}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 4. Account Session */}
+          <div className="panel mb20">
+            <div style={{ padding: 18 }}>
+              <div className="sec-lbl">ACCOUNT SESSION</div>
+              <div className="setting-row" style={{ borderBottom: "none" }}>
+                <div>
+                  <div className="setting-lbl">Sign Out</div>
+                  <div className="setting-sub">Log out from connection and device session</div>
+                </div>
+                <button className="btn btn-danger" onClick={store.logout}>Logout</button>
+              </div>
+            </div>
+          </div>
 
           {Object.keys(store.prs).length > 0 && (
             <div className="panel">
