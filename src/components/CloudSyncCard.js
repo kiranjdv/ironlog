@@ -10,6 +10,8 @@ import {
   restoreDatabaseSnapshot,
   encryptPayload,
   decryptPayload,
+  DEFAULT_GOOGLE_CLIENT_ID,
+  sanitizeClientId,
 } from "../utils/cloudSync";
 
 export default function CloudSyncCard({ store }) {
@@ -17,7 +19,7 @@ export default function CloudSyncCard({ store }) {
 
   // Persistent settings state
   const provider = settings?.cloudSyncProvider || "gdrive";
-  const clientId = settings?.googleClientId || "";
+  const clientId = settings?.googleClientId || DEFAULT_GOOGLE_CLIENT_ID;
   const autoSync = settings?.autoCloudSync || false;
   const lastSync = settings?.lastCloudSync || null;
   const webdavUrl = settings?.webdavUrl || "";
@@ -31,14 +33,14 @@ export default function CloudSyncCard({ store }) {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [status, setStatus] = useState(null); // { type: 'success' | 'error' | 'info', message: '' }
-  const [tempClientId, setTempClientId] = useState(clientId);
+  const [tempClientId, setTempClientId] = useState(clientId || DEFAULT_GOOGLE_CLIENT_ID);
   const [tempWebdavUrl, setTempWebdavUrl] = useState(webdavUrl);
   const [tempWebdavUser, setTempWebdavUser] = useState(webdavUser);
   const [tempWebdavPass, setTempWebdavPass] = useState("");
 
   useEffect(() => {
-    setTempClientId(clientId);
-  }, [clientId]);
+    setTempClientId(settings?.googleClientId || DEFAULT_GOOGLE_CLIENT_ID);
+  }, [settings?.googleClientId]);
 
   const showStatus = (type, message, timeout = 5000) => {
     setStatus({ type, message });
@@ -54,9 +56,11 @@ export default function CloudSyncCard({ store }) {
   };
 
   const handleSaveClientId = () => {
+    const cleaned = sanitizeClientId(tempClientId || DEFAULT_GOOGLE_CLIENT_ID);
+    setTempClientId(cleaned);
     saveSettings({
       ...settings,
-      googleClientId: tempClientId.trim(),
+      googleClientId: cleaned,
     });
     showStatus("success", "Google Client ID saved locally.");
   };
@@ -71,17 +75,18 @@ export default function CloudSyncCard({ store }) {
 
   const handleConnectGoogle = async () => {
     try {
-      if (!tempClientId.trim()) {
+      const targetId = sanitizeClientId(tempClientId || DEFAULT_GOOGLE_CLIENT_ID);
+      if (!targetId) {
         showStatus("error", "Please provide a Google OAuth Client ID first.");
         return;
       }
       setIsSyncing(true);
       showStatus("info", "Opening Google sign-in window...");
-      const authResult = await requestGoogleAccessToken(tempClientId.trim());
+      const authResult = await requestGoogleAccessToken(targetId);
       setGoogleToken(authResult.accessToken);
       saveSettings({
         ...settings,
-        googleClientId: tempClientId.trim(),
+        googleClientId: targetId,
       });
       showStatus("success", "Connected to Google Drive! You can now Sync or Restore.");
     } catch (err) {

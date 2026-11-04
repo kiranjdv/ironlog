@@ -253,8 +253,19 @@ export function loadGoogleIdentityServices() {
   });
 }
 
+export const DEFAULT_GOOGLE_CLIENT_ID =
+  "186337090416-rveb2mgcs8et10io3q7221ubtinolb9c.apps.googleusercontent.com";
+
+export function sanitizeClientId(rawId = "") {
+  return rawId
+    .replace(/[\u2010\u2012\u2013\u2014\u2015]/g, "-") // replace unicode hyphens/en-dashes/em-dashes
+    .replace(/\s+/g, "") // remove accidental spaces/newlines
+    .trim();
+}
+
 export async function requestGoogleAccessToken(clientId) {
-  if (!clientId || !clientId.trim()) {
+  const activeClientId = sanitizeClientId(clientId || DEFAULT_GOOGLE_CLIENT_ID);
+  if (!activeClientId) {
     throw new Error("Please enter your Google OAuth Client ID.");
   }
 
@@ -267,11 +278,19 @@ export async function requestGoogleAccessToken(clientId) {
   return new Promise((resolve, reject) => {
     try {
       const tokenClient = window.google.accounts.oauth2.initTokenClient({
-        client_id: clientId.trim(),
+        client_id: activeClientId,
         scope: "https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file",
         callback: (resp) => {
           if (resp.error) {
-            reject(new Error(resp.error_description || resp.error || "Google authentication failed."));
+            if (resp.error === "access_denied") {
+              reject(
+                new Error(
+                  "Access Denied (403): Google Cloud Console me 'OAuth consent screen' par scroll karke apna email 'Test Users' list me ADD karein."
+                )
+              );
+            } else {
+              reject(new Error(resp.error_description || resp.error || "Google authentication failed."));
+            }
           } else if (resp.access_token) {
             resolve({
               accessToken: resp.access_token,
