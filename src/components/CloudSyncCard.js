@@ -39,7 +39,12 @@ export default function CloudSyncCard({ store }) {
   const [tempWebdavPass, setTempWebdavPass] = useState("");
 
   useEffect(() => {
-    setTempClientId(settings?.googleClientId || DEFAULT_GOOGLE_CLIENT_ID);
+    const current = settings?.googleClientId;
+    if (!current || !current.includes(".apps.googleusercontent.com") || current.length < 60) {
+      setTempClientId(DEFAULT_GOOGLE_CLIENT_ID);
+    } else {
+      setTempClientId(current);
+    }
   }, [settings?.googleClientId]);
 
   const showStatus = (type, message, timeout = 5000) => {
@@ -63,6 +68,15 @@ export default function CloudSyncCard({ store }) {
       googleClientId: cleaned,
     });
     showStatus("success", "Google Client ID saved locally.");
+  };
+
+  const handleResetClientId = () => {
+    setTempClientId(DEFAULT_GOOGLE_CLIENT_ID);
+    saveSettings({
+      ...settings,
+      googleClientId: DEFAULT_GOOGLE_CLIENT_ID,
+    });
+    showStatus("success", "Reset to official Google Client ID!");
   };
 
   const handleSavePassphrase = (val) => {
@@ -122,7 +136,8 @@ export default function CloudSyncCard({ store }) {
         let token = googleToken;
         if (!token) {
           showStatus("info", "Requesting Google authorization...");
-          const auth = await requestGoogleAccessToken(tempClientId.trim());
+          const activeId = sanitizeClientId(tempClientId || DEFAULT_GOOGLE_CLIENT_ID);
+          const auth = await requestGoogleAccessToken(activeId);
           token = auth.accessToken;
           setGoogleToken(token);
         }
@@ -181,7 +196,8 @@ export default function CloudSyncCard({ store }) {
         let token = googleToken;
         if (!token) {
           showStatus("info", "Requesting Google authorization...");
-          const auth = await requestGoogleAccessToken(tempClientId.trim());
+          const activeId = sanitizeClientId(tempClientId || DEFAULT_GOOGLE_CLIENT_ID);
+          const auth = await requestGoogleAccessToken(activeId);
           token = auth.accessToken;
           setGoogleToken(token);
         }
@@ -357,9 +373,21 @@ export default function CloudSyncCard({ store }) {
                 className="btn btn-out"
                 style={{ padding: "8px 12px", fontSize: 12 }}
                 onClick={handleSaveClientId}
+                title="Save this Client ID"
               >
                 Save
               </button>
+              {tempClientId !== DEFAULT_GOOGLE_CLIENT_ID && (
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  style={{ padding: "8px 10px", fontSize: 12, color: "var(--accent)" }}
+                  onClick={handleResetClientId}
+                  title="Reset to official working Client ID"
+                >
+                  ↺ Reset
+                </button>
+              )}
             </div>
 
             <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
